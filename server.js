@@ -63,54 +63,6 @@ app.set('view engine', 'ejs');
 
 app.locals.isActiveRoute = isActiveRoute;
 
-// Sync models with the database
-// sequelize.sync() // Set force: true to drop and recreate tables
-//     .then(() => {
-//         console.log('Database synced successfully');
-//     })
-//     .catch(err => {
-//         console.log('Error syncing database: ', err);
-//     });
-// Middleware to extract the subdomain (vendor)
-/*app.use((req, res, next) => {
-    const host = req.headers.host.split('.');
-    req.vendor = host.length > 2 ? host[0] : null;  // "vender1" in vender1.streetlight.com
-    next();
-});*/
-
-//Get sub Domain
-// app.use((req, res, next) => {
-//     const host = req.headers.host.split('.');
-//     console.log(req.headers.host);
-//     console.log(host[0]);
-//     if (host[0] !== 'localhost' && host.length > 1) {
-//         //req.vendor = host[0]; // "vender1" in vender1.streetlight.com
-//         req.vendorreq = host[0]; // "vender1" in vender1.streetlight.com
-//     } else {
-//         req.vendorreq = null;
-//     }
-
-//     console.log(req.vendorreq);
-
-//     next();
-// });
-// Route handler for vendor-specific login
-/*app.get('/login', (req, res) => {
-
-    if (!req.vendorreq) {
-        return res.status(400).send("Invalid URL: Vendor subdomain is required.");
-    }
-
-    let vender = venderSiteList.find(x => x.subdomain == req.vendorreq.toString().toLowerCase())
-    if (vender != undefined) {
-        res.send(`<p style="font-size:56px;text-align: center;margin-top:56px;">Login page for ${vender.name}</p>`);
-    }
-    else {
-        return res.status(400).send("Invalid URL: Vendor subdomain is invalid.");
-    }
-    // Render a login page specific to the vendor
-});*/
-
 readdirSync("./routes/api/").map((c) => {
     app.use(process.env.URL_API, require("./routes/api/" + c))
 });
@@ -122,30 +74,3 @@ readdirSync("./routes/pages/").map((c) => {
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log("Server is running on port " + port));
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// const venderSiteList = [
-//     {
-//         name: 'Archi-tronic',
-//         subdomain: 'archi',
-//         appearance: {
-//             logo: 'archi_logo.png',
-//             background: 'archi_cover.png'
-//         }
-//     },
-//     {
-//         name: 'Nottingham',
-//         subdomain: 'ham',
-//         appearance: {
-//             logo: 'ham_logo.png',
-//             background: 'ham_cover.png'
-//         }
-//     },
-//     {
-//         name: 'Gideon Crop',
-//         subdomain: 'gideon',
-//         appearance: {
-//             logo: 'gideon_logo.png',
-//             background: 'gideon_cover.png'
-//         }
-//     },
-// ]

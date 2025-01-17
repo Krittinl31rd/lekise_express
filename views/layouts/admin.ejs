@@ -23,17 +23,13 @@
             const selectedLang=event.target.value;
             const currentUrl=window.location.origin+window.location.pathname;
             const searchParams=new URLSearchParams(window.location.search);
-
-            // Update the 'lang' parameter
             searchParams.set('lang', selectedLang);
-
-            // Redirect to the new URL
             window.location.href=currentUrl+'?'+searchParams.toString();
         }
     </script>
 </head>
 
-<body class="font-poppins">
+<body class="<%= i18n.getLocale() == 'th' ? 'font-kanit' : 'font-poppins' %>">
 
     <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-black">
         <div class="animate-spin rounded-full h-14 w-14 border-t-4 border-blue-500 dark:border-purple-500"></div>
@@ -56,7 +52,7 @@
 
                     <div class="relative h-[60px] w-auto flex-grow">
                         <p class="absolute font-semibold text-[36px] text-black dark:text-white top-0">LeKise</p>
-                        <p class="absolute font-poppins font-normal text-[12px] text-black dark:text-white bottom-0">
+                        <p class="absolute font-normal text-[12px] text-black dark:text-white bottom-0">
                             Streetlight
                             control</p>
                     </div>
@@ -69,7 +65,7 @@
                         class="w-full flex items-center p-2 rounded-lg group <%= isActiveRoute('/', currentRoute) %>">
                         <i
                             class='bx bxs-dashboard transition duration-75 text-gray-900  dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'></i>
-                        <span class="ms-3 font-poppins font-semibold">
+                        <span class="ms-3 font-semibold ">
                             <%= i18n.__('dashboard') %>
                         </span>
                     </a>
@@ -79,7 +75,7 @@
                         class="w-full flex items-center p-2 rounded-lg <%= isActiveRoute('/lamp', currentRoute) %> group">
                         <i
                             class='bx bxs-bolt transition duration-75 text-gray-900  dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'></i>
-                        <span class="ms-3 font-poppins font-semibold">
+                        <span class="ms-3 font-semibold">
                             <%= i18n.__('lamp') %>
                         </span>
                     </a>
@@ -89,7 +85,7 @@
                         class="w-full flex items-center p-2 rounded-lg <%= isActiveRoute('/mapview', currentRoute) %> group">
                         <i
                             class='bx bx-map-alt transition duration-75 text-gray-900  dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'></i>
-                        <span class="ms-3 font-poppins font-semibold">
+                        <span class="ms-3 font-semibold">
                             <%= i18n.__('map') %>
                         </span>
                     </a>
@@ -185,7 +181,8 @@
 
     <div class="h-[calc(100vh-64px)] p-4 lg:ml-64 flex flex-col dark:bg-black dark:text-white relative ">
         <% if (messages.success) { %>
-            <div id="alertLogin" class="fixed flex items-center w-full max-w-xs p-4 space-x-4 text-white bg-green-400 rounded-lg shadow top-5 right-5 dark:text-white animate-fade-in-down transition-opacity duration-500 ease-out"
+            <div id="alertLogin"
+                class="fixed flex items-center w-full max-w-xs p-4 space-x-4 text-white bg-green-400 rounded-lg shadow top-5 right-5 dark:text-white animate-fade-in-down transition-opacity duration-500 ease-out"
                 role="alert">
                 <span class="block sm:inline">
                     <%= messages.success %>
@@ -208,11 +205,11 @@
         window.addEventListener('load', () => {
             const preloader=document.getElementById('preloader');
             preloader.classList.add('hidden');
-            setTimeout(()=>{
-                if(document.getElementById('alertLogin')){
+            setTimeout(() => {
+                if (document.getElementById('alertLogin')) {
                     document.getElementById('alertLogin').remove();
                 }
-            },2000);
+            }, 3500);
         });
     </script>
 

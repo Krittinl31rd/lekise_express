@@ -34,7 +34,7 @@
 
 </head>
 
-<body class="font-poppins">
+<body class="<%= i18n.getLocale() == 'th' ? 'font-kanit' : 'font-poppins' %>">
 
     <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-black">
         <div class="animate-spin rounded-full h-14 w-14 border-t-4 border-blue-500 dark:border-purple-500"></div>
@@ -57,7 +57,7 @@
 
                     <div class="relative h-[60px] w-auto flex-grow">
                         <p class="absolute font-semibold text-[36px] text-black dark:text-white top-0">LeKise</p>
-                        <p class="absolute font-poppins font-normal text-[12px] text-black dark:text-white bottom-0">
+                        <p class="absolute font-normal text-[12px] text-black dark:text-white bottom-0">
                             Streetlight
                             control</p>
                     </div>
@@ -70,7 +70,7 @@
                         class="w-full flex items-center p-2 rounded-lg <%= isActiveRoute('/controller', currentRoute) %> group">
                         <i
                             class='bx bx-map-alt transition duration-75 text-gray-900  dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'></i>
-                        <span class="ms-3 font-poppins font-semibold">
+                        <span class="ms-3 font-semibold">
                             <%= i18n.__('map') %>
                         </span>
                     </a>
@@ -193,7 +193,7 @@
         if (document.getElementById('alertLogin')) {
             setTimeout(() => {
                 document.getElementById('alertLogin').remove();
-            }, 2000);
+            }, 3500);
         }
     </script>
 

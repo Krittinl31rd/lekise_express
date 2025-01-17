@@ -2,7 +2,6 @@
 module.exports={
   content: [
     "./views/**/*.ejs",
-    "./public/**/*.html",
     // './src/**/*.{html,js,ejs,ts,jsx,tsx}',
     "./node_modules/flowbite/**/*.js"
   ],
@@ -12,6 +11,7 @@ module.exports={
       serif: ['Merriweather', 'serif'],
       mono: ['ui-monospace', 'SFMono-Regular'],
       poppins: ['poppins', 'poppins-Regular'],
+      kanit: ['Kanit', 'serif'],
     },
     extend: {
       colors: {

@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/css/style.css" rel="stylesheet">
     <link href="/css/cstyle.css" rel="stylesheet">
-    <!-- <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script> -->
-    <!-- <script src="/js/OneSignalSDK.js" defer></script> -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
@@ -16,7 +14,7 @@
     </title>
 </head>
 
-<body class="font-poppins">
+<body class="<%= i18n.getLocale() == 'th' ? 'font-kanit' : 'font-poppins'  %>">
 
     <div class="flex flex-col items-center justify-center min-h-screen bg-black">
         <% if (messages.error) { %>
@@ -36,8 +34,7 @@
                 </button>
             </div>
             <% } %>
-                <div
-                    class="relative flex flex-col m-6 space-y-8 rounded-3xl md:flex-row md:space-y-0 bg-gradient-to-b from-[#212121] to-[#010101]
+                <div class="relative flex flex-col m-6 space-y-8 rounded-3xl md:flex-row md:space-y-0 bg-gradient-to-b from-[#212121] to-[#010101]
                     animate-fade-in-down transition-opacity duration-500 ease-out">
 
                     <div class="flex flex-col justify-center items-center p-10 space-y-2 ">
@@ -63,7 +60,8 @@
                                 <span class="mb-2 text-md text-white">
                                     <%= i18n.__('password') %>
                                 </span>
-                                <input type="password" placeholder="<%= i18n.__('enteryourpassword') %>" name="password" required
+                                <input type="password" placeholder="<%= i18n.__('enteryourpassword') %>" name="password"
+                                    required
                                     class="w-full p-3 rounded-md focus:ring-0  border-gray-300 placeholder:font-light placeholder:text-gray-500">
                             </div>
 
