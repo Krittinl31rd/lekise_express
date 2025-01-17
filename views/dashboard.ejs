@@ -1,0 +1,173 @@
+<div id="dashboardOverview" class="flex-1 overflow-auto space-y-4 p-4 animate-fade-in-down transition-opacity duration-500 ease-out">
+
+    <div
+        class="px-[24px] border-gray-200 dark:border-gray-800 border-[1px] rounded-[16px] grid grid-cols-2 md:grid-cols-4">
+
+        <div class="relative h-[64px] w-auto">
+            <div class="absolute w-full h-full flex flex-col justify-center">
+                <p class="font-semibold text-[16px] text-gray-800 dark:text-gray-200">
+                    <%= i18n.__('totalContracts') %>
+                </p>
+                <p class="font-medium text-[12px] text-gray-500 dark:text-gray-200">
+                    <span id="total-contracts"></span>
+                    <%= i18n.__('contract') %>
+                </p>
+            </div>
+        </div>
+        <div class="relative h-[64px] w-auto">
+            <div class="absolute top-3 h-[42px] w-[1px] bg-gray-200"></div>
+            <div class="absolute w-full h-full flex flex-col justify-center ml-[16px] md:ml-[16px]">
+                <p class="font-semibold text-[16px] text-gray-800 dark:text-gray-200">
+                    <%= i18n.__('totalDevices') %>
+                </p>
+                <p class="font-medium text-[12px] text-gray-500 dark:text-gray-200">
+                    <span id="total-devices"></span>
+                    <%= i18n.__('device') %>
+                </p>
+            </div>
+        </div>
+        <div class="relative h-[64px] w-auto">
+            <div class="absolute top-3 h-[42px] w-[1px] bg-gray-200 hidden md:block"></div>
+            <div class="absolute w-full h-full flex flex-col justify-center md:ml-[16px]">
+                <p class="font-semibold text-[16px] text-gray-800 dark:text-gray-200">
+                    <%= i18n.__('online') %>
+                </p>
+                <p class="font-medium text-[12px] text-gray-500 dark:text-gray-200">
+                    <span id="total-online"></span>
+                    <%= i18n.__('device') %>
+                </p>
+            </div>
+        </div>
+        <div class="relative h-[64px] w-auto">
+            <div class="absolute top-3 h-[42px] w-[1px] bg-gray-200"></div>
+            <div class="absolute w-full h-full flex flex-col justify-center ml-[16px] md:ml-[16px]">
+                <p class="font-semibold text-[16px] text-gray-800 dark:text-gray-200">
+                    <%= i18n.__('offline') %>
+                </p>
+                <p class="font-medium text-[12px] text-gray-500 dark:text-gray-200">
+                    <span id="total-offline"></span>
+                    <%= i18n.__('device') %>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid">
+        <div class="w-[300px] h-[300px]">
+            <canvas id="deviceStatusPieChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+    var translations={
+        device: "<%= i18n.__('device') %>",
+        online: "<%= i18n.__('online') %>",
+        offline: "<%= i18n.__('offline') %>",
+        device: "<%= i18n.__('device') %>",
+    };
+
+    let devicesByGateway=[]
+
+
+    async function getData() {
+        let allDataList= <%- JSON.stringify(data)%>;
+        const siteData=allDataList.devices.filter(item => item.GatewayID!==undefined);
+        const deviceData=allDataList.devices.filter(item => item.MemberID!==undefined);
+
+        siteData.forEach(site => {
+            const matchingDevices=deviceData.filter(device => device.MemberID===site.GatewayID);
+            devicesByGateway.push({
+                ...site,
+                devices: matchingDevices
+            });
+        });
+        // let allDevices=[]
+        // allDevices=devicesByGateway.flatMap(contract => contract.devices)
+    }
+
+
+    getData()
+        .then(() => {
+            console.log(devicesByGateway)
+            generateDashboard()
+        })
+        .catch((err) => console.log(err));
+
+
+    function generateDashboard() {
+        let totalOnline=0;
+        let totalOffline=0;
+
+        const contractNumbers=[];
+        const onlineCounts=[];
+        const offlineCounts=[];
+
+        devicesByGateway.forEach((contract) => {
+            let contractOnline=0;
+            let contractOffline=0;
+
+            contract.devices.forEach((device) => {
+                device.controls.forEach((control) => {
+                    if (control.Label.toLowerCase()==='online') {
+                        if (control.LastValue===1) contractOnline++;
+                        else if (control.LastValue===0) contractOffline++;
+                    }
+                });
+            });
+
+            totalOnline+=contractOnline;
+            totalOffline+=contractOffline;
+
+            // Prepare devicesByGateway for chart
+            contractNumbers.push(contract.ContractNumber);
+            onlineCounts.push(contractOnline);
+            offlineCounts.push(contractOffline);
+        });
+
+        document.getElementById('total-contracts').textContent=devicesByGateway.length;
+        document.getElementById('total-devices').textContent=devicesByGateway.reduce((sum, contract) => sum+contract.devices.length, 0);
+        document.getElementById('total-online').textContent=totalOnline;
+        document.getElementById('total-offline').textContent=totalOffline;
+
+        // Create the Pie Chart
+        const ctxPie=document.getElementById('deviceStatusPieChart').getContext('2d');
+        const deviceStatusPieChart=new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: [translations.online, translations.offline],
+                datasets: [{
+                    data: [totalOnline, totalOffline], // Total Online and Offline devices
+                    backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
+
+    }
+
+
+
+</script>

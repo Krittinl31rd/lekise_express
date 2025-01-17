@@ -1,0 +1,42 @@
+/* ./public/css/tailwind.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded-md;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-white rounded-md;
+}
+
+@layer utilities {
+    .inputRange {
+        @apply w-full h-3 rounded-full cursor-pointer;
+        appearance: none;
+    }
+
+    .inputRange::-webkit-slider-thumb {
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 9999px;
+        background: #ffffff;
+        box-shadow: none;
+    }
+
+    .inputRange::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 9999px;
+        background: #ffffff;
+        border: none;
+        box-shadow: none;
+    }
+}

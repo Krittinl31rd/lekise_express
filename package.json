@@ -1,0 +1,40 @@
+{
+  "name": "lekise-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./public/css/tailwind.css -o ./public/css/style.css --watch",
+    "start": "nodemon server.js",
+    "dev": "concurrently \"npm run build:css\" \"nodemon server.js\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "boxicons": "^2.1.4",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-ejs-layouts": "^2.5.1",
+    "express-flash": "^0.0.2",
+    "express-session": "^1.18.1",
+    "flowbite": "^2.5.2",
+    "i18n": "^0.15.1",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "mssql": "^11.0.1",
+    "mysql2": "^3.11.4",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "dotenv": "^16.4.7",
+    "nodemon": "^3.1.9",
+    "postcss": "^8.4.49",
+    "postcss-cli": "^11.0.0",
+    "tailwindcss": "^3.4.17"
+  }
+}

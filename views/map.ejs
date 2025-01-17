@@ -1,0 +1,642 @@
+<div
+    class="relative flex-1 flex flex-row justify-center overflow-auto space-x-4 h-full animate-fade-in-down transition-opacity duration-500 ease-out">
+    <div id="googleMap" class="w-full flex-1 rounded-lg bg-gray-200"></div>
+    <div class="absolute top-0 -left-4 w-[calc(100%-316px)] p-4 overflow-auto flex items-center justify-end space-x-2">
+        <button id="markerAll" type="button"
+            class="flex gap-1 items-center text-sm py-2 px-4 bg-white text-black rounded-full shadow-md hover:bg-gray-100">
+            <i class='bx bx-devices'></i>
+            <%= i18n.__('all') %>
+        </button>
+        <button id="makerOnline" type="button"
+            class="flex gap-1 items-center text-sm py-2 px-4 bg-white text-green-600 rounded-full shadow-md hover:bg-gray-100">
+            <i class='bx bx-wifi'></i>
+            <%= i18n.__('online') %>
+        </button>
+        <button id="makerOffline" type="button"
+            class="flex gap-1 items-center text-sm py-2 px-4 bg-white text-red-600 rounded-full shadow-md hover:bg-gray-100">
+            <i class='bx bx-wifi-off'></i>
+            <%= i18n.__('offline') %>
+        </button>
+    </div>
+
+    <div class="w-[300px] h-full flex flex-col rounded-lg bg-gradient-to-br 
+        from-[#F4F6F8] via-[#ECE9F9] via-70% to-[#F7E6F2] 
+        dark:from-[#171717] dark:via-[#23212B] dark:via-70% dark:to-[#2B2527]">
+
+        <div id="tabMap" class="flex flex-col w-full h-full px-2 py-4 space-y-4">
+            <div class="w-full">
+                <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
+                    Search
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <i class='bx bx-search'></i>
+                    </div>
+                    <input type="search" id="lamp-search"
+                        class="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="<%= i18n.__('search') %>" required />
+
+                </div>
+            </div>
+
+            <div id="tableDevices" class="flex-1 w-full overflow-auto space-y-2">
+
+            </div>
+        </div>
+
+        <div id="tabConfig" class="flex-col w-full h-full px-2 py-4 space-y-4 hidden">
+            <button id="backConfig" class="py-2"><i class='bx bxs-chevron-left'></i>
+                <%= i18n.__('back') %>
+            </button>
+            <div id="bodyConfig" class="flex-1 w-full overflow-auto space-y-4"></div>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYZDA2s7REmeois7IiulX5lW7F1JnaP4o&callback=myMap" async
+    defer></script>
+
+<script>
+    let devicesByGateway=[]
+    let currentOpened=null;
+    let map;
+    let infoWindow;
+    let ws;
+    let configOpened;
+    var translations={
+        offline: "<%= i18n.__('offline') %>",
+        online: "<%= i18n.__('online') %>",
+        poweron: "<%= i18n.__('poweron') %>",
+        poweroff: "<%= i18n.__('poweroff') %>",
+        brightness: "<%= i18n.__('brightness') %>",
+        nameDevice: "<%= i18n.__('nameDevice') %>",
+        typeDevice: "<%= i18n.__('typeDevice') %>",
+        status: "<%= i18n.__('status') %>",
+        close: "<%= i18n.__('close') %>",
+        ok: "<%= i18n.__('ok') %>",
+        cmdOffline: "<%= i18n.__('cmdOffline') %>",
+        noSearchReuslt: "<%= i18n.__('noSearchReuslt') %>",
+        notFoundDeviceOffline: "<%= i18n.__('notFoundDeviceOffline') %>",
+        notFoundDeviceOnline: "<%= i18n.__('notFoundDeviceOnline') %>",
+
+    };
+
+    async function getData() {
+        return devicesByGateway= <%- JSON.stringify(data)%>
+  }
+
+    getData()
+        .then(() => {
+            console.log(devicesByGateway)
+            displayTableDevices()
+            connectWS()
+        })
+        .catch((err) => console.log(err));
+
+    function displayTableDevices(filteredData=devicesByGateway) {
+        const elemTableDevices=document.getElementById('tableDevices');
+        elemTableDevices.innerHTML=''
+
+        let createGatewayRow=filteredData.map((g) => {
+            const deviceList=g.devices.map(device => {
+                return `
+                    <div class="text-sm px-2 flex items-center w-full">
+                        <button id="btnNavigateToLamp${g.GatewayID}${device.DeviceID}" class="navigate relative p-2 w-full h-full flex items-center space-x-2 r rounded-lg">
+                            <span class="relative flex h-2 w-2" id="activeStatus${g.GatewayID}${device.DeviceID}">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${device.controls[2].LastValue==1? "bg-green-500":"bg-red-500"}"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 ${device.controls[2].LastValue==1? "bg-green-500":"bg-red-500"}"></span>
+                            </span>
+                            <span>${device.DeviceName}</span>
+                            <span id="badgeOffline${g.GatewayID}${device.DeviceID}" class="${device.controls[0].LastValue==1? "hidden":"block"} bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">${translations.offline}</span>
+                        </button> 
+                        <button id="btnConfigLamp${g.GatewayID}${device.DeviceID}" 
+                        data-gateway-id="${g.GatewayID}" 
+                        data-device-id="${device.DeviceID}" 
+                        class="px-4 py-2"><i class='bx bxs-chevron-right' ></i></button>
+                    </div>
+                `
+            }).join('')
+            return `
+                ${deviceList}
+            `
+        }).join('')
+        elemTableDevices.innerHTML=createGatewayRow;
+
+        devicesByGateway.forEach((g) => {
+            g.devices.forEach((device) => {
+                const buttonId=`btnNavigateToLamp${g.GatewayID}${device.DeviceID}`;
+                const buttonElement=document.getElementById(buttonId);
+
+                if (buttonElement) {
+                    buttonElement.addEventListener('click', () => {
+                        navigateToLamp(g, device);
+                    });
+                }
+
+
+                const buttonConfigId=`btnConfigLamp${g.GatewayID}${device.DeviceID}`;
+                const buttonConfigElement=document.getElementById(buttonConfigId);
+                if (buttonConfigElement) {
+                    buttonConfigElement.addEventListener('click', (e) => {
+                        document.getElementById('tabMap').classList.toggle('hidden');
+                        document.getElementById('tabConfig').classList.toggle('hidden');
+                        if (e) {
+                            const target=e.currentTarget;
+                            const gId=target.dataset.gatewayId;
+                            const devId=target.dataset.deviceId;
+                            const gateway=devicesByGateway.find((g) => g.GatewayID==gId)
+                            if (gateway!=null||gateway!=undefined) {
+                                const dev=gateway.devices.find((dev) => dev.DeviceID==devId)
+                                if (dev!=null||dev!=undefined) {
+                                    configLampElement(gateway, dev);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+
+    }
+
+    document.getElementById('backConfig').addEventListener('click', () => {
+        configOpened=false;
+        closeInfoWindow()
+        document.getElementById('tabConfig').classList.toggle('hidden');
+        document.getElementById('tabMap').classList.toggle('hidden');
+        document.getElementById('bodyConfig').innerHTML=""
+    })
+
+    document.getElementById('lamp-search').addEventListener('keydown', (event) => {
+        if (event.key==='Enter') {
+            const searchTerm=event.target.value.toLowerCase().trim();
+            const filteredDevices=devicesByGateway
+                .map((gateway) => ({
+                    ...gateway,
+                    devices: gateway.devices.filter((device) =>
+                        device.DeviceName.toLowerCase().includes(searchTerm)
+                    ),
+                }))
+                .filter((gateway) => gateway.devices.length>0);
+            if (filteredDevices.length>0) {
+                displayTableDevices(filteredDevices);
+                myMap(filteredDevices);
+            } 
+        }
+    });
+
+    function configLampElement(gateway, dev) {
+        configOpened=true;
+        const bodyConfig=document.getElementById('bodyConfig');
+        bodyConfig.innerHTML="";
+        let newElem=`
+                                    <h3 class="text-md font-medium dark:text-white">
+                                        <span id="badgeConfigOffline${gateway.GatewayID}${dev.DeviceID}" class="${dev.controls[0].LastValue==1? "hidden":"w-full"} bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                                        ${translations.offline}</span>
+                                        ${dev.DeviceName} <span class="text-xs">#${dev.DeviceID}</span> |
+                                        <span id="label${gateway.GatewayID}${dev.DeviceID}" class="${dev.controls[2].LastValue==1? "text-green-500":"text-red-500"}">
+                                            ${dev.controls[2].LastValue==1? translations.poweron:translations.poweroff}
+                                        </span> 
+                                    </h3>
+                                        <div class="flex items-center justify-start gap-2 w-full">
+                                            <button class="w-[110px] h-[30px] bg-green-400 rounded-md font-semibold text-black" id="btnPowerOn${gateway.GatewayID}${dev.DeviceID}" ${dev.controls[0].LastValue==1? "":"disabled"}>${translations.poweron}</button>
+                                            <button class="w-[110px] h-[30px] bg-red-400 rounded-md font-semibold text-black" id="btnPowerOff${gateway.GatewayID}${dev.DeviceID}" ${dev.controls[0].LastValue==1? "":"disabled"}>${translations.poweroff}</button>
+                                        </div>
+                                        <div class="flex flex-col items-start gap-2 w-full">
+                                            <div class="flex space-x-2">
+                                                <h5 class=" text-black dark:text-white">${translations.brightness}</h5>
+                                                <h5 class=" text-black dark:text-white"><span id="rangeBrightnessValue${gateway.GatewayID}${dev.DeviceID}">${dev.controls[1].LastValue}</span>%</h5>
+                                            </div>
+                                        </div>
+                                        <div class="w-full flex flex-col justify-center space-y-2">
+                                            <div class="w-full flex items-center">
+                                                <input id="rangeBrightness${gateway.GatewayID}${dev.DeviceID}" ${dev.controls[0].LastValue==1? "":"disabled"}
+                                                value="${dev.controls[1].LastValue}" min="0" max="100" 
+                                                type="range" 
+                                                class="inputRange"
+                                                style="background: linear-gradient(90deg, #3b82f6 ${(dev.controls[1].LastValue-1)/(100-1)*100}%, #374151 ${(dev.controls[1].LastValue-1)/(100-1)*100}%);" />
+                                            </div>
+                                            <div class="grid grid-cols-3">
+                                                <label>0</label>
+                                                <label class="text-center">50</label>
+                                                <label class="text-end">100</label>
+                                            </div>
+                                        </div>
+                                `
+
+        bodyConfig.insertAdjacentHTML("beforeend", newElem);
+
+        navigateToLamp(gateway, dev);
+
+        let range=document.getElementById(`rangeBrightness${gateway.GatewayID}${dev.DeviceID}`);
+        const activeColor="#3b82f6";
+        const inactiveColor="#374151";
+        range.addEventListener('input', (e) => {
+            const ratio=(e.target.value-e.target.min)/(e.target.max-e.target.min)*100;
+            e.target.style.background=`linear-gradient(90deg, ${activeColor} ${ratio}%, ${inactiveColor} ${ratio}%)`;
+            let label=document.getElementById(`rangeBrightnessValue${gateway.GatewayID}${dev.DeviceID}`);
+            label.innerText=e.target.value;
+        })
+        range.addEventListener('change', (e) => {
+            // {"cmd":3,"param":{"Member":3,"Device":3001,"Ctrl":2,"V":0}}
+            const value=e.target.value;
+            let dataBright;
+            let dataOnOff;
+            if (value==0) {
+                dataBright=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 1, "V": value } })
+                dataOnOff=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 2, "V": 0 } })
+            } else {
+                dataBright=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 1, "V": value } })
+                dataOnOff=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 2, "V": 1 } })
+            }
+            ws.send(dataBright)
+            ws.send(dataOnOff)
+        })
+
+        const btnOn=document.getElementById(`btnPowerOn${gateway.GatewayID}${dev.DeviceID}`);
+        const btnOff=document.getElementById(`btnPowerOff${gateway.GatewayID}${dev.DeviceID}`)
+        btnOn.addEventListener('click', (e) => {
+            // {"cmd":3,"param":{"Member":3,"Device":3001,"Ctrl":2,"V":1}}
+            let dataBright;
+            let dataOnOff;
+            const bright=dev.controls[1].LastValue;
+            if (bright==0) {
+                dataBright=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 1, "V": 100 } })
+                dataOnOff=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 2, "V": 1 } })
+            } else {
+                dataBright=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 1, "V": bright } })
+                dataOnOff=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 2, "V": 1 } })
+            }
+            ws.send(dataBright)
+            ws.send(dataOnOff)
+        })
+        btnOff.addEventListener('click', (e) => {
+            // {"cmd":3,"param":{"Member":3,"Device":3001,"Ctrl":2,"V":0}}
+            const dataOnOff=JSON.stringify({ "cmd": 3, "param": { "Member": gateway.GatewayID, "Device": dev.DeviceID, "Ctrl": 2, "V": 0 } })
+            ws.send(dataOnOff)
+        })
+    }
+
+    function navigateToLamp(g, device) {
+        currentOpened={ gID: g.GatewayID, devID: device.DeviceID };
+        map.panTo(device.marker.position);
+        const customContent=`
+                    <div class="flex flex-col text-black gap-y-[8px] font-medium w-32">
+                        <p>${translations.nameDevice}: ${device.DeviceName}</p>
+                        <p>${translations.typeDevice}: ${device.DeviceStyleID}</p>
+                        <p id="status${g.GatewayID}-${device.DeviceID}" class="${device.controls[0]?.LastValue==1? "text-green-500":"text-red-500"}">
+                            ${translations.status}: ${device.controls[0]?.LastValue==1? translations.online:translations.offline}</p>
+                        <p>${translations.brightness}: <span id="bright${g.GatewayID}-${device.DeviceID}">${device.controls[1].LastValue}</span>%</p>
+                        <button class="bg-red-300 px-[8px] py-[4px] rounded-[4px] w-full" onclick="closeInfoWindow()">${translations.close}</button>
+                    </div>
+                `;
+        infoWindow.setContent(customContent);
+        infoWindow.open(map, device.marker);
+    }
+
+
+    function selectIcon(type) {
+        let icon;
+        switch (type) {
+            case 1:
+                icon={
+                    url: "/images/lampoffline.gif",
+                    scaledSize: new google.maps.Size(56, 56),
+                };
+                break;
+            case 2:
+                icon={
+                    url: "/images/lampon.png",
+                    scaledSize: new google.maps.Size(56, 56),
+                };
+                break;
+            case 3:
+                icon={
+                    url: "/images/lampoff.png",
+                    scaledSize: new google.maps.Size(56, 56),
+                };
+                break;
+            default:
+                icon=null;
+        }
+
+        return icon;
+    }
+
+
+    document.getElementById('markerAll').addEventListener('click', () => {
+        myMap()
+        displayTableDevices()
+    });
+
+    document.getElementById('makerOffline').addEventListener('click', () => {
+        const filteredDevices=devicesByGateway.map((gateway) => ({
+            ...gateway,
+            devices: gateway.devices.filter((device) =>
+                device.controls[0].LastValue==0
+            ),
+        })).filter((gateway) => gateway.devices.length>0);
+        if (filteredDevices.length>0) {
+            myMap(filteredDevices)
+            displayTableDevices(filteredDevices)
+        } else {
+            alertModal(`<p>${translations.notFoundDeviceOffline}</p>`, 'warning')
+        }
+    });
+
+    document.getElementById('makerOnline').addEventListener('click', () => {
+        const filteredDevices=devicesByGateway.map((gateway) => ({
+            ...gateway,
+            devices: gateway.devices.filter((device) =>
+                device.controls[0].LastValue==1
+            ),
+        })).filter((gateway) => gateway.devices.length>0);
+
+        if (filteredDevices.length>0) {
+            myMap(filteredDevices)
+            displayTableDevices(filteredDevices)
+        } else {
+            alertModal(`<p>${translations.notFoundDeviceOnline}</p>`, 'warning')
+        }
+    });
+
+    function myMap(filteredData=devicesByGateway) {
+        const mapProp={
+            center: {
+                lat: 13.774828033530847,
+                lng: 100.60785953508227
+            },
+            zoom: 18,
+            disableDefaultUI: true,
+            styles: [
+                { featureType: "poi", stylers: [{ visibility: "off" }] },
+                { featureType: "transit", stylers: [{ visibility: "off" }] },
+            ],
+        };
+        map=new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+        infoWindow=new google.maps.InfoWindow({ disableAutoPan: true });
+
+        hideInfoWindowCloseButton();
+
+        const bounds=new google.maps.LatLngBounds();
+
+        filteredData.forEach((g, gindex) => {
+            g.devices.forEach((device, index) => {
+                const position={
+                    lat: parseFloat(device.Latitude),
+                    lng: parseFloat(device.Longitude),
+                };
+                const onoff=device.controls[0]?.LastValue;
+                const stats=device.controls[2]?.LastValue
+                let icon=selectIcon(1)
+
+                if (onoff==1) {
+                    if (stats==0) {
+                        icon=selectIcon(3);
+                    } else if (stats==1) {
+                        icon=selectIcon(2);
+                    }
+                }
+
+                const marker=new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    icon: icon,
+                    // icon: device.onoff==1? selectIcon(2):selectIcon(1),
+                    title: `[${g.GatewayID}] | [${device.DeviceID}]${device.DeviceName}`,
+                });
+
+                device.marker=marker;
+
+                bounds.extend(position);
+
+                marker.addListener("click", () => {
+                    currentOpened={ gID: g.GatewayID, devID: device.DeviceID }
+                    const customContent=`
+                    <div class="flex flex-col text-black gap-y-[8px] font-medium w-32">
+                        <p>${translations.nameDevice}: ${device.DeviceName}</p>
+                        <p>${translations.typeDevice}: ${device.DeviceStyleID}</p>
+                        <p id="status${g.GatewayID}-${device.DeviceID}" class="${device.controls[0]?.LastValue==1? "text-green-500":"text-red-500"}">
+                            ${translations.status}: ${device.controls[0]?.LastValue==1? translations.online:translations.offline}</p>
+                         <p>${translations.brightness}: <span id="bright${g.GatewayID}-${device.DeviceID}">${device.controls[1].LastValue}</span>%</p>
+                        <button class="bg-red-300 px-[8px] py-[4px] rounded-[4px] w-full" onclick="closeInfoWindow()">${translations.close}</button>
+                    </div>
+                `;
+                    infoWindow.setContent(customContent);
+                    infoWindow.open(map, marker);
+                    if (configOpened==true) {
+                        configLampElement(g, device);
+                    }
+
+                });
+            });
+        });
+
+        map.fitBounds(bounds);
+    }
+
+    function hideInfoWindowCloseButton() {
+        const style=document.createElement('style');
+        style.innerHTML=`
+        .gm-ui-hover-effect {
+            display: none !important;
+        }
+    `;
+        document.head.appendChild(style);
+    }
+
+
+
+    function closeInfoWindow() {
+        if (infoWindow) {
+            infoWindow.close();
+            currentOpened=null;
+            document.querySelectorAll('.navigate').forEach(btn => {
+                btn.classList.remove('bg-white');
+                btn.classList.remove('dark:bg-black');
+            });
+        }
+    }
+
+
+
+
+    function connectWS() {
+        ws=new WebSocket("ws://localhost:8000/echo");
+        // ws=new WebSocket("wss://archismarthome.com:8000/echo");
+        console.log("Connection : "+ws.url);
+
+        ws.onmessage=(event) => {
+            // console.log("data : "+event.data);
+            const obj=JSON.parse(event.data);
+            checkCommand(obj.cmd, obj.param);
+        }
+        ws.onopen=(event) => {
+            console.log("onopen : "+JSON.stringify(event));
+            sendLogin();
+        }
+        ws.onclose=(event) => {
+            console.log("onclose : code("+event.code+"), reason("+event.reason+")");
+        }
+
+    }
+
+    function sendLogin() {
+        const data=JSON.stringify({ "cmd": 1, "param": { "Username": "bird", "Password": "123456789" } })
+        ws.send(data);
+    }
+
+
+    function checkCommand(cmd, payload) {
+        console.log("Command:"+cmd);
+        if (cmd==1) {
+            // res.LoginResult
+            if (payload.Success==1) {
+                // getFriendInformation();
+            }
+            console.log("Login :"+(payload.Success==1? "Logedin":"Failed"));
+        } else if (cmd==34) {
+            // res.FriendInformation
+            const { Member, Message, Success }=payload
+            if (Member!=undefined) {
+                // initData(Member)
+            }
+        } else if (cmd==31) {
+            // res.Control
+            const { Ctrl, Device, Member, V }=payload
+            console.log({ Ctrl, Device, Member, V })
+            const dev=devicesByGateway
+                .find(dev => dev.GatewayID==Member)
+                ?.devices.find(d => d.DeviceID==Device)
+            if (dev!=null) {
+                if (dev.DeviceStyleID==3) {
+                    if (Ctrl==0) {
+                        // online-offline
+                        dev.controls[0].LastValue=V;
+                        const icon=dev.controls[0]?.LastValue==1? selectIcon(2):selectIcon(1);
+                        if (icon) {
+                            dev.marker.setIcon(icon);
+                        } else {
+                            console.warn("Invalid icon returned");
+                        }
+                        if (currentOpened!=null) {
+                            if (Member==currentOpened?.gID&&Device==currentOpened?.devID) {
+                                let elem=document.getElementById(`status${Member}-${Device}`);
+                                elem.innerText=`${translations.status}: ${V==1? translations.online:translations.offline}`
+                                if (V==0) {
+                                    updateClass(elem, 'text-green-500', 'text-red-500');
+                                } else {
+                                    updateClass(elem, 'text-red-500', 'text-green-500');
+                                }
+                            }
+                        }
+                        const badge=document.getElementById(`badgeOffline${Member}${Device}`)
+                        if (badge) {
+                            if (V==0) {
+                                badge.classList.remove('hidden')
+                            } else {
+                                badge.classList.add('hidden')
+                            }
+                        }
+                        const elements=[
+                            document.getElementById(`btnPowerOn${Member}${Device}`),
+                            document.getElementById(`btnPowerOff${Member}${Device}`),
+                            document.getElementById(`rangeBrightness${Member}${Device}`),
+                        ]
+                        const validElements=elements.filter(el => el!==null);
+                        if (validElements.length>0) {
+                            validElements.forEach(element => {
+                                V==0? element.disabled=true:element.disabled=false;
+                            });
+                        }
+                    } else if (Ctrl==1) {
+                        // brightnesss
+                        if (dev.controls[1].LastValue!=V) {
+                            dev.controls[1].LastValue=V;
+                            if (Member==currentOpened?.gID&&Device==currentOpened?.devID) {
+                                let elem=document.getElementById(`bright${Member}-${Device}`);
+                                elem.innerText=V
+                            }
+                            let range=document.getElementById(`rangeBrightness${Member}${Device}`);
+                            if (range) {
+                                const activeColor="#3b82f6";
+                                const inactiveColor="#374151";
+                                range.value=V
+                                const ratio=(range.value-range.min)/(range.max-range.min)*100;
+                                range.style.background=`linear-gradient(90deg, ${activeColor} ${ratio}%, ${inactiveColor} ${ratio}%)`;
+                                let label=document.getElementById(`rangeBrightnessValue${Member}${Device}`);
+                                label.innerText=V;
+                            }
+                        }
+                    } else if (Ctrl==2) {
+                        //  status on-off
+                        dev.controls[2].LastValue=V;
+                        const icon=dev.controls[2]?.LastValue==1? selectIcon(2):selectIcon(3);
+                        if (icon) {
+                            dev.marker.setIcon(icon);
+                        } else {
+                            console.warn("Invalid icon returned");
+                        }
+                        let elem=document.getElementById(`activeStatus${Member}${Device}`);
+                        if (elem) {
+                            V==1
+                                ? elem.innerHTML=`<span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dev.controls[2].LastValue==1? "bg-green-500":"bg-red-500"}"></span>
+                                 <span class="relative inline-flex rounded-full h-2 w-2 ${dev.controls[2].LastValue==1? "bg-green-500":"bg-red-500"}"></span>`
+                                :elem.innerHTML=`<span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dev.controls[2].LastValue==1? "bg-red-500":"bg-red-500"}"></span>
+                                 <span class="relative inline-flex rounded-full h-2 w-2 ${dev.controls[2].LastValue==1? "bg-red-500":"bg-red-500"}"></span>`
+                        }
+                        let label=document.getElementById(`label${Member}${Device}`);
+                        if (label) {
+                            label.innerText=V==1? translations.poweron:translations.poweroff
+                            if (V==0) {
+                                updateClass(label, 'text-green-500', 'text-red-500');
+                            } else {
+                                updateClass(label, 'text-red-500', 'text-green-500');
+                            }
+                        }
+                    }
+                }
+            }
+
+        } else if (cmd==99) {
+            const { Status, Message }=payload
+            if (Status==0) {
+                Swal.fire({
+                    html: `
+              <p>${translations.cmdOffline}</p>
+            `,
+                    icon: 'error',
+                    confirmButtonText: translations.ok,
+                    customClass: {
+                        confirmButton: 'bg-purple-700 dark:bg-blue-700 text-white px-4 py-2 rounded-lg',
+                    },
+                })
+            }
+        }
+    }
+
+    function updateClass(element, removeClass, addClass) {
+        if (element) {
+            element.classList.remove(removeClass);
+            element.classList.add(addClass);
+        } else {
+            console.error("Element not found");
+        }
+    }
+
+    function alertModal(html, icon) {
+        Swal.fire({
+            html: html,
+            icon: icon,
+            confirmButtonText: translations.ok,
+            customClass: {
+                confirmButton: 'bg-purple-700 dark:bg-blue-700 text-white px-4 py-2 rounded-lg',
+            },
+        })
+    }
+
+</script>

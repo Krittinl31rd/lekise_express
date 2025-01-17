@@ -1,0 +1,1545 @@
+<div class="grid grid-cols-1 md:grid-cols-3 md:gap-2 xl:grid-cols-3 animate-fade-in-down transition-opacity duration-500 ease-out">
+  <div class="w-full flex flex-col gap-2 justify-center">
+    <label class="block text-sm font-medium dark:text-white">
+      <%= i18n.__('contractNumber') %>
+    </label>
+    <select id="selectContractNumber"
+      class="bg-gray-50 border border-gray-300 text-gray-900 mb-6 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+    </select>
+  </div>
+  <div class="w-full flex flex-col gap-2 justify-center">
+    <label class="block text-sm font-medium dark:text-white">
+      <%= i18n.__('group') %>
+    </label>
+    <select id="selectGroup"
+      class="bg-gray-50 border border-gray-300 text-gray-900 mb-6 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+    </select>
+  </div>
+  <div class="w-full flex flex-col gap-2 justify-start">
+    <label class="block text-sm font-medium dark:text-white">
+      <%= i18n.__('search') %>
+    </label>
+    <div class="flex items-center relative">
+      <input type="text" id="searchData"
+        class="z-20 bg-gray-50 border border-gray-300 border-r-0   text-gray-900 text-sm rounded-lg rounded-r-none focus:ring-0 focus:border-purple-500 block w-full ps-4 p-2.5  dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]"
+        placeholder="<%= i18n.__('placeholderSearch') %>" required />
+      <button id="searchDataBtn"
+        class="z-20 flex items-center h-full px-4 py-1 rounded-r-lg text-xl bg-purple-500 dark:bg-[#77DDFF] text-white dark:text-black"><i
+          class='bx bx-search'></i></button>
+      <!-- search recommend -->
+      <div id="inputSearchShow"
+        class="hidden overflow-y-auto z-10 absolute w-full max-h-64 top-10 left-0 rounded-bl-lg rounded-br-lg border shadow-xl dark:border-gray-600  bg-white dark:bg-[#1C1E1F] ">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- sort control -->
+<div class="flex items-center justify-end w-full mt-4 md:mt-[-12px] animate-fade-in-down transition-opacity duration-500 ease-out">
+  <div class="flex flex-col gap-2 w-full items-end">
+    <select id="sortDataBtn"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full sm:w-52 p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+    </select>
+  </div>
+</div>
+
+<!-- pagination control -->
+<div id="paginationControlsTop" class="grid grid-cols-1 my-4 sm:grid-cols-2 animate-fade-in-down transition-opacity duration-500 ease-out">
+  <div>paginationControlsTop</div>
+</div>
+
+<div id="controlDevices"
+  class="w-full bg-gray-100 dark:bg-[#1C1E1F] px-2 py-4 rounded-t-lg border-b border-gray-500 dark:border-gray-700 animate-fade-in-down transition-opacity duration-500 ease-out">
+</div>
+
+<!-- table -->
+<div class="flex-1 overflow-auto p-2 rounded-b-lg bg-white dark:bg-[#1C1E1F] animate-fade-in-down transition-opacity duration-500 ease-out" id="containerTable">
+</div>
+<!-- pagination control -->
+<div id="paginationControlsBottom" class="grid grid-cols-1 my-4 sm:grid-cols-2 animate-fade-in-down transition-opacity duration-500 ease-out">
+  paginationControlsBottom
+</div>
+
+<script>
+  var ws;
+  var translations={
+    offline: "<%= i18n.__('offline') %>",
+    online: "<%= i18n.__('online') %>",
+    poweron: "<%= i18n.__('poweron') %>",
+    poweroff: "<%= i18n.__('poweroff') %>",
+    brightness: "<%= i18n.__('brightness') %>",
+    set: "<%= i18n.__('set') %>",
+    nameDevice: "<%= i18n.__('nameDevice') %>",
+    typeDevice: "<%= i18n.__('typeDevice') %>",
+    status: "<%= i18n.__('status') %>",
+    close: "<%= i18n.__('close') %>",
+    save: "<%= i18n.__('save') %>",
+    cancle: "<%= i18n.__('cancle') %>",
+    AutomationSchedule: "<%= i18n.__('AutomationSchedule') %>",
+    setAutomation: "<%= i18n.__('setAutomation') %>",
+    startTime: "<%= i18n.__('startTime') %>",
+    endTime: "<%= i18n.__('endTime') %>",
+    scheduleSaved: "<%= i18n.__('scheduleSaved') %>",
+    saveSuccess: "<%= i18n.__('saveSuccess') %>",
+    scheduleDetails: "<%= i18n.__('scheduleDetails') %>",
+    ok: "<%= i18n.__('ok') %>",
+    notSet: "<%= i18n.__('notSet') %>",
+    cmdOffline: "<%= i18n.__('cmdOffline') %>",
+    optionContractNumber: "<%= i18n.__('optionContractNumber') %>",
+    sortby: "<%= i18n.__('sortby') %>",
+    deviceName: "<%= i18n.__('deviceName') %>",
+    contractNumberSearch: "<%= i18n.__('contractNumberSearch') %>",
+    searhAll: "<%= i18n.__('searhAll') %>",
+    pleaseSelectLamp: "<%= i18n.__('pleaseSelectLamp') %>",
+    inputBrightValue: "<%= i18n.__('inputBrightValue') %>",
+    lamp: "<%= i18n.__('lamp') %>",
+    manage: "<%= i18n.__('manage') %>",
+    day: "<%= i18n.__('day') %>",
+    undefined: "<%= i18n.__('undefined') %>",
+    optionGroup: "<%= i18n.__('optionGroup') %>",
+    group: "<%= i18n.__('group') %>",
+    noSearchReuslt: "<%= i18n.__('noSearchReuslt') %>",
+    days: [
+      {
+        id: 1,
+        name: "<%= i18n.__('sun') %>"
+      },
+      {
+        id: 2,
+        name: "<%= i18n.__('mon') %>"
+      },
+      {
+        id: 3,
+        name: "<%= i18n.__('tue') %>"
+      },
+      {
+        id: 4,
+        name: "<%= i18n.__('wed') %>"
+      },
+      {
+        id: 5,
+        name: "<%= i18n.__('thu') %>"
+      },
+      {
+        id: 6,
+        name: "<%= i18n.__('fri') %>"
+      },
+      {
+        id: 7,
+        name: "<%= i18n.__('sat') %>"
+      }
+    ],
+    sort: [
+      {
+        // "online",
+        id: 1,
+        value: "<%= i18n.__('online') %>"
+      },
+      {
+        // "offline"
+        id: 2,
+        value: "<%= i18n.__('offline') %>"
+      },
+      {
+        // "Power On",
+        id: 3,
+        value: "<%= i18n.__('poweron') %>"
+      },
+      {
+        // "Power Off"
+        id: 4,
+        value: "<%= i18n.__('poweroff') %>"
+      }
+    ]
+  };
+
+  let currentIndex=-1;
+  let allDataList=[]
+  let devicesByGateway=[]
+  let allDevices=[]
+  let searchItems=[];
+  let checkedDevices={};
+  let selectedCount=0
+  let schedule={}
+
+  async function getData() {
+    allDataList= <%- JSON.stringify(data)%>;
+    const siteData=allDataList.devices.filter(item => item.GatewayID!==undefined);
+    const deviceData=allDataList.devices.filter(item => item.MemberID!==undefined);
+
+    siteData.forEach(site => {
+      const matchingDevices=deviceData.filter(device => device.MemberID===site.GatewayID);
+      devicesByGateway.push({
+        ...site,
+        devices: matchingDevices
+      });
+    });
+    allDevices=devicesByGateway.flatMap(contract => contract.devices)
+  }
+
+  // select fillter and search
+  let selectContractNumber=document.getElementById('selectContractNumber')
+  let selectGroup=document.getElementById('selectGroup')
+  let getSearchInputValue=document.getElementById('searchData')
+  let searchDataBtn=document.getElementById('searchDataBtn')
+  let inputSearchShow=document.getElementById('inputSearchShow');
+  let sortDataBtn=document.getElementById('sortDataBtn');
+
+  let getContractNumberValue=null
+  let getGroupValue=null
+  let getSortValue=null
+  let filterTypes=["DeviceName", "ContractNumber", "GroupName"]
+
+  getData()
+    .then(() => {
+      console.log(devicesByGateway);
+      ControlLampList();
+      manageMenuDataBeforeDisplay();
+      connectWS();
+    })
+    .catch((err) => console.log(err));
+
+
+
+  function ControlLampList(getSearchInputData=null) {
+    const contractNumber=[...new Set(allDataList.contract.map(data => data.ContractNumber))];
+    const group=[...new Set(allDataList.group.map((data) => data.GroupName))];
+
+    selectContractNumber.innerHTML='';
+    let createConteactNumberOption=contractNumber.map((data) => {
+      return `<option value="${data}">${data}</option>`
+    })
+    selectGroup.innerHTML='';
+    let createGroupOption=group.map((data) => {
+      return `<option value="${data}">${data}</option>`
+    })
+    let createSortOption=translations.sort.map((data) => {
+      return `<option value="${data.id}">${data.value}</option>`
+    })
+
+    if (getSearchInputData==null||getSearchInputData=="") {
+      selectContractNumber.innerHTML=`<option value="all">${translations.optionContractNumber}</option>`
+      selectContractNumber.innerHTML+=createConteactNumberOption
+      selectGroup.innerHTML=`<option value="all">${translations.optionGroup}</option>`
+      selectGroup.innerHTML+=createGroupOption
+      sortDataBtn.innerHTML=`<option value="all">${translations.sortby}</option>`
+      sortDataBtn.innerHTML+=createSortOption
+      sortDataBtn.value=getSortValue==""||getSortValue==null? "all":getSortValue
+    } else {
+      // when search
+      selectContractNumber.innerHTML=`<option value="all">${translations.optionContractNumber}</option>`
+      selectContractNumber.innerHTML+=createConteactNumberOption
+      selectContractNumber.value=getContractNumberValue
+      selectGroup.innerHTML=`<option value="all">${translations.optionGroup}</option>`
+      selectGroup.innerHTML+=createGroupOption
+      selectGroup.value=getGroupValue
+      sortDataBtn.innerHTML=`<option value="all">${translations.sortby}</option>`
+      sortDataBtn.innerHTML+=createSortOption
+      sortDataBtn.value=getSortValue
+
+      let filterLampList=createKeyFilter(getSearchInputData);
+      inputSearchShow.innerHTML=""
+      // create recommend search
+      if (filterLampList.length!=0) {
+        inputSearchShow.classList.remove('hidden')
+        let createRecommendSearchTx=filterLampList.map((data) => {
+          let matchType;
+          if (data.matchType=="DeviceName") {
+            matchType=translations.deviceName
+          } else if (data.matchType=="ContractNumber") {
+            matchType=translations.contractNumberSearch
+          } else if (data.matchType=="GroupName") {
+            matchType=translations.group
+          }
+          let highlightedText=data.highlight.replace(/\[(.*?)\]/g, '<span class="bg-yellow-200 font-normal dark:bg-gray-600">$1</span>');
+          return `<p class="search-item text-sm font-light text-black py-2 px-4 border-b hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-800 dark:text-white dark:border-gray-600"
+                    data-key="${data.fullKey}" data-type="${data.matchType}">${highlightedText}<br>
+                    <span class="font-medium text-xs text-gray-500 dark:text-gray-400">${matchType}</span></p>`;
+        }).join('');
+        inputSearchShow.innerHTML=`<p class="search-item-all search-item text-sm font-light text-black py-2 px-4 border-b hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-800 dark:text-white dark:border-gray-600">${translations.searhAll}`
+        inputSearchShow.innerHTML+=createRecommendSearchTx
+
+        document.querySelector('.search-item-all').addEventListener('click', () => {
+          searchAll();
+        })
+        document.querySelectorAll('.search-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const key=item.getAttribute('data-key');
+            const type=item.getAttribute('data-type')
+            getSearchInputValue.value=key
+            inputSearchShow.classList.add("hidden")
+
+            if (type=="DeviceName") {
+              allDevices=devicesByGateway
+                .flatMap(contract => contract.devices)
+                .filter(data => data.DeviceName==key)
+            } else if (type=="ContractNumber") {
+              allDevices=devicesByGateway
+                .filter(data => data.ContractNumber==key)
+                .flatMap(contract => contract.devices)
+            } else if (type=="GroupName") {
+              allDevices=devicesByGateway
+                .flatMap(contract => contract.devices)
+                .filter(data => data.GroupName==key)
+            }
+            sortDataBeforeDisplay();
+            displayDataToTable()
+          });
+        });
+      } else {
+        inputSearchShow.classList.add("hidden")
+      }
+    }
+  }
+
+
+  // click enter on keyboard to search 
+  getSearchInputValue.addEventListener('keydown', (e) => {
+    searchItems=document.querySelectorAll('.search-item');
+    if (e.key==='ArrowDown') {
+      if (e.target.value!=null&&e.target.value!="") {
+        e.preventDefault();
+        navigateSearchResults(1);
+      }
+    } else if (e.key==='ArrowUp') {
+      if (e.target.value!=null&&e.target.value!="") {
+        e.preventDefault();
+        navigateSearchResults(-1);
+      }
+    } else if (e.key==='Enter') {
+      e.preventDefault();
+      if (currentIndex>=0&&searchItems.length>0) {
+        searchItems[currentIndex].click();
+      } else if (e.target.value!=null&&e.target.value!="") {
+        filterDataWhenSearch(e.target.value.toLowerCase());
+      } else {
+        searchAll();
+      }
+    } else if (e.key==='Backspace') {
+      currentIndex=-1;
+    }
+  })
+
+  document.addEventListener('click', (e) => {
+    if (!getSearchInputValue.contains(e.target)&&!inputSearchShow.contains(e.target)) {
+      inputSearchShow.classList.add("hidden");
+    }
+  })
+
+  function filterDataWhenSearch(dataValue) {
+    let filterLampList=createKeyFilter(dataValue);
+
+    allDevices=devicesByGateway
+      .flatMap(contract =>
+        contract.devices.filter(device =>
+          filterLampList.some(filter =>
+            (contract[filter.matchType]==filter.fullKey)||
+            (device[filter.matchType]==filter.fullKey)
+          )
+        )
+      );
+    sortDataBeforeDisplay();
+    displayDataToTable()
+  }
+
+
+  function navigateSearchResults(direction) {
+    if (currentIndex>=0) {
+      searchItems[currentIndex].classList.remove('bg-gray-100', 'dark:bg-gray-800');
+    }
+    currentIndex+=direction;
+
+    if (currentIndex>=searchItems.length) {
+      currentIndex=0;
+    } else if (currentIndex<0) {
+      currentIndex=searchItems.length-1;
+    }
+
+    if (currentIndex>=0&&searchItems.length>0) {
+      const selectedItem=searchItems[currentIndex];
+      selectedItem.classList.add('bg-gray-100', 'dark:bg-gray-800');
+      selectedItem.scrollIntoView({ block: 'nearest' }); // Ensure visibility
+    }
+  }
+
+  // click button to search 
+  searchDataBtn.addEventListener('click', () => {
+    if (getSearchInputValue.value!=null&&getSearchInputValue.value!="") {
+      filterDataWhenSearch(getSearchInputValue.value)
+    } else {
+      searchAll();
+    }
+  })
+
+  function searchAll() {
+    selectContractNumber.value="all"
+    selectGroup.value="all"
+    allDevices=devicesByGateway.flatMap(contract => contract.devices)
+    inputSearchShow.classList.add("hidden")
+    inputSearchShow.innerHTML=""
+    getSearchInputValue.value=""
+    manageMenuDataBeforeDisplay();
+  }
+
+  selectContractNumber.addEventListener("change", function () {
+    manageMenuDataBeforeDisplay();
+  });
+
+  selectGroup.addEventListener("change", function () {
+    manageMenuDataBeforeDisplay();
+  });
+
+  sortDataBtn.addEventListener("change", function () {
+    manageMenuDataBeforeDisplay();
+  });
+
+  getSearchInputValue.addEventListener("input", (e) => {
+    ControlLampList(e.target.value.toLowerCase());
+  })
+
+  // Show the search results when the search bar is focused
+  getSearchInputValue.addEventListener('focus', () => {
+    inputSearchShow.classList.remove("hidden");
+  });
+
+
+  function sortDataBeforeDisplay() {
+    getSortValue=sortDataBtn.value;
+    if (getSortValue==1) {
+      allDevices.sort((a, b) => b.controls[0].LastValue-a.controls[0].LastValue);
+    } else if (getSortValue==2) {
+      allDevices.sort((a, b) => a.controls[0].LastValue-b.controls[0].LastValue);
+    } else if (getSortValue==3) {
+      allDevices.sort((a, b) => b.controls[2].LastValue-a.controls[2].LastValue);
+    } else if (getSortValue==4) {
+      allDevices.sort((a, b) => a.controls[2].LastValue-b.controls[2].LastValue);
+    }
+  }
+
+  function manageMenuDataBeforeDisplay() {
+    inputSearchShow.innerHTML=''
+    let getSearchValue=getSearchInputValue.value;
+    getContractNumberValue=selectContractNumber.value;
+    getGroupValue=selectGroup.value;
+    currentPage=1;
+
+    if (getSearchValue==""||getSearchValue==null) {
+      if (getContractNumberValue=="all"&&getGroupValue=="all") {
+        allDevices=devicesByGateway.flatMap(contract => contract.devices)
+      } else if (getContractNumberValue!="all"&&getGroupValue=="all") {
+        allDevices=devicesByGateway
+          .filter(contract => contract.ContractNumber==getContractNumberValue)
+          .flatMap(contract => contract.devices);
+      } else if (getContractNumberValue=="all"&&getGroupValue!="all") {
+        allDevices=devicesByGateway
+          .flatMap(contract => contract.devices)
+          .filter(dev => dev.GroupName==getGroupValue)
+      } else {
+        allDevices=devicesByGateway
+          .filter(contract => contract.ContractNumber==getContractNumberValue)
+          .flatMap(contract => contract.devices)
+          .filter(dev => dev.GroupName==getGroupValue)
+      }
+    } else {
+
+    }
+    sortDataBeforeDisplay()
+    displayDataToTable();
+  }
+
+  function createKeyFilter(getSearchInputData) {
+    return devicesByGateway
+      .filter((contract) =>
+        getContractNumberValue==="all"||contract.ContractNumber===getContractNumberValue
+      )
+      .flatMap((contract) =>
+        contract.devices
+          .filter((dev) =>
+            getGroupValue==="all"||dev.GroupName===getGroupValue
+          )
+          .flatMap((device) => {
+            return filterTypes
+              .filter((key) => {
+                // Check if the key exists in either contract or device and is a string
+                return (
+                  (contract[key]&&typeof contract[key]==="string")||
+                  (device[key]&&typeof device[key]==="string")
+                );
+              })
+              .filter((key) => {
+                // Check if the key matches the search input in either contract or device
+                return (
+                  (contract[key]&&contract[key].toLowerCase().includes(getSearchInputData.toLowerCase()))||
+                  (device[key]&&device[key].toLowerCase().includes(getSearchInputData.toLowerCase()))
+                );
+              })
+              .map((key) => {
+                // Determine the source (contract or device) and highlight the match
+                const source=contract[key]&&contract[key].toLowerCase().includes(getSearchInputData.toLowerCase())
+                  ? contract[key]
+                  :device[key];
+                const highlightedKey=source.replace(
+                  new RegExp(getSearchInputData, "i"),
+                  (match) => `[${match}]`
+                );
+                return {
+                  fullKey: source,
+                  matchType: key, // Indicates whether the match was in ContractNumber or DeviceName
+                  highlight: highlightedKey,
+                };
+              });
+          })
+      );
+  }
+
+
+
+  function displayDataToTable() {
+    let controlDevicesBody=document.getElementById('controlDevices');
+    controlDevicesBody.innerHTML=`
+    <div class="w-full flex flex-col items-center justify-center gap-2 lg:flex-row lg:justify-between">
+      <div class="flex-1 flex items-center order-last lg:order-none">
+        <input id="checkAllDataPage" type="checkbox" class="cursor-pointer w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:text-cyan-500 dark:focus:ring-[#77DDFF] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+        <h5 class="ml-4 font-normal dark:text-white"><%= i18n.__('youseleted') %> <span id="checkStatus">${selectedCount}</span> <%= i18n.__('lamp') %></span>
+      </div>
+
+      <div class="flex flex-col items-center justify-start sm:flex-row lg:justify-center gap-2 ">
+        <div class="flex gap-2">
+          <button id="btnPowerOnLampSelect" class="w-[110px] py-1  bg-green-400 rounded-md font-semibold text-black"><%= i18n.__('poweron') %></button>
+          <button id="btnPowerOffLampSelect" class="w-[110px] py-1  bg-red-400 rounded-md font-semibold text-black"><%= i18n.__('poweroff') %></button>
+        </div>
+      </div>
+
+       <div class="flex justify-center items-center gap-2 h-full pr-2 dark:border-white ">
+          <h5 class="font-semibold text-black dark:text-white">${translations.brightness}</h5>
+          <input type="number" id="inputBrightSelect" aria-describedby="helper-text-explanation" placeholder="%"
+          class="h-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-20  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#77DDFF] dark:focus:border-[#77DDFF]"
+          min="0" max="100"  />
+          <button id="btnSetBrightSelect" class="px-4 h-[30px] bg-purple-500 text-white rounded-md font-semibold dark:bg-[#77DDFF] dark:text-black">${translations.set}</button>
+        </div>
+
+      <div class="flex justify-center items-center gap-2">
+          <button id="btnManageLampSelect" class="px-8 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md"><%= i18n.__('manage') %></button>
+      </div>
+
+    </div>
+    `
+
+    let containerTable=document.getElementById('containerTable');
+    containerTable.innerHTML=''
+
+    if (allDevices.length>0) {
+
+
+      let paginatedData=getPaginatedData(allDevices);
+
+      let createGatewayRow=paginatedData.map((device) => {
+        let gateway=devicesByGateway.find((i) => i.GatewayID==device.MemberID)
+        let deviceKey=`${device.MemberID}${device.DeviceID}`;
+        let isChecked=checkedDevices[deviceKey]?.checked||false;
+
+        return `
+        <div class="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-9 space-y-4 px-8">
+          <!-- cols1 -->
+          <div class="flex items-center justify-start gap-4 w-full lg:col-span-2">
+            <input  ${isChecked? 'checked':''} id="checkbox-${device.MemberID}-${device.DeviceID}" type="checkbox" class="checkbox-item w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:text-cyan-500 dark:focus:ring-[#77DDFF] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <div class="flex-1 flex flex-col justify-start items-start text-black dark:text-white ">
+              <label class="font-normal break-all text-lgl">${device.DeviceName}</label>
+              <label class="font-light break-all text-xs">KM101-102</label>
+            </div>
+          </div>
+          <!-- cols2 -->
+          <div class="flex flex-col items-start justify-center w-full text-black dark:text-white lg:col-span-2">
+            <label class="font-light break-all text-xs"><%= i18n.__('contractNumber') %></label>
+            <label class="font-normal break-all text-lg">${gateway.ContractNumber}</label>
+          </div>
+          <!-- cols3 -->
+          <div class="flex flex-col items-start justify-start w-full text-black dark:text-white lg:col-span-2 lg:justify-center">
+            <div class="flex items-start lg:items-start gap-2">
+              <label class="font-light text-xs"><%= i18n.__('site') %></label>
+              <label class="font-semibold text-xs break-all">${allDataList.site.Name}</label>
+            </div>
+            <div class="flex items-start lg:items-start gap-2">
+              <label class="font-light text-xs"><%= i18n.__('group') %></label>
+              <label class="font-semibold text-xs break-all">${device.GroupName||translations.undefined}</label>
+            </div>
+          </div>
+          <!-- cols4 -->
+          <div class="flex flex-col items-start justify-start w-full text-black dark:text-white lg:col-span-2">
+            <div class="flex flex-row justify-start items-start w-full sm:items-center md:items-start lg:flex-col lg:items-start 2xl:justify-start lg:h-full">
+              <label class="mr-2 font-ligh text-xs"><%= i18n.__('status') %></label>
+              <div class="w-full flex flex-col items-start sm:flex-row md:flex-col 2xl:flex-row lg:gap-1 2xl:items-center">
+                <div class="flex flex-col sm:flex-row md:flex-col sm:gap-1 lg:flex-row">
+                    ${device.controls[0].LastValue==0
+            ? `<span class="text-red-500 font-semibold break-all" id="status${gateway.GatewayID}${device.controls[0].DeviceID}">${translations.offline}</span>`
+            :`<span class="text-green-500 font-semibold break-all" id="status${gateway.GatewayID}${device.controls[0].DeviceID}">${translations.online}</span>`}
+                  <span class="hidden sm:block md:hidden lg:block xl:block">|</span>
+                  ${device.controls[2].LastValue==0
+            ? `<span class="text-center break-all text-red-500 font-semibold" id="power${gateway.GatewayID}${device.controls[2].DeviceID}">${translations.poweroff}</span>`
+            :`<span class="text-center break-all text-green-500 font-semibold" id="power${gateway.GatewayID}${device.controls[2].DeviceID}">${translations.poweron}</span>`}
+                  <span class="hidden sm:block md:hidden 2xl:block">|</span>
+                </div>
+                <div class="flex gap-0 sm:gap-1">
+                  <span class="font-semibold" id="bright${gateway.GatewayID}${device.controls[1].DeviceID}"><span class="md:hidden">&nbsp</span>${device.controls[1].LastValue}</span><span>%</span>
+                  <span class="hidden md:block"><%= i18n.__('brightness') %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- cols5 -->
+          <div class="col-span-2 flex items-center justify-center w-full  text-black dark:text-white md:col-span-4 lg:col-span-1">
+            <button type="button" id="lamp-modal-btn${gateway.GatewayID}${device.DeviceID}" class="text-center py-1 w-full bg-blue-600 text-white rounded-md hover:bg-blue-700"><%= i18n.__('manage') %></button>
+          </div>
+        </div>
+        `
+      }).join('');
+      containerTable.innerHTML=createGatewayRow;
+      renderPaginationControls()
+
+      let checkboxes=document.querySelectorAll('.checkbox-item');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+          let idParts=checkbox.id.replace('checkbox-', '').split('-');
+          let MemberID=idParts[0];
+          let DeviceID=idParts[1];
+          let deviceKey=`${MemberID}${DeviceID}`
+          checkedDevices[deviceKey]={
+            checked: checkbox.checked,
+            MemberID: MemberID,
+            DeviceID: DeviceID
+          };
+
+          updateCheckStatus();
+        });
+      });
+
+      // "Check All" functionality
+      let checkAllDataPage=document.getElementById('checkAllDataPage');
+      checkAllDataPage.addEventListener('change', function () {
+        let checkboxes=document.querySelectorAll('.checkbox-item');
+        checkboxes.forEach(checkbox => {
+          checkbox.checked=checkAllDataPage.checked;
+
+          let idParts=checkbox.id.replace('checkbox-', '').split('-');
+          let MemberID=idParts[0];
+          let DeviceID=idParts[1];
+          let deviceKey=`${MemberID}${DeviceID}`
+          checkedDevices[deviceKey]={
+            checked: checkbox.checked,
+            MemberID: MemberID,
+            DeviceID: DeviceID
+          };
+          updateCheckStatus();
+        });
+      });
+
+      function updateCheckStatus() {
+        selectedCount=Object.values(checkedDevices).filter(i => i.checked).length;
+        document.getElementById('checkStatus').textContent=selectedCount;
+      }
+
+      let btnPowerOnLampSelect=document.getElementById('btnPowerOnLampSelect');
+      btnPowerOnLampSelect.addEventListener('click', () => {
+        let lampSelect=Object.values(checkedDevices).filter(i => i.checked==true)
+        if (lampSelect.length>0) {
+          lampSelect.forEach(selectedLamp => {
+            const device=devicesByGateway.flatMap(contract => contract.devices).find(dev =>
+              dev.MemberID==selectedLamp.MemberID&&
+              dev.DeviceID==selectedLamp.DeviceID
+            );
+            sendWs('controlOn', device)
+          });
+        } else {
+          const html=`<p>${translations.pleaseSelectLamp}</p>`
+          alertModal(html, 'warning')
+        }
+      })
+
+
+      let btnPowerOffLampSelect=document.getElementById('btnPowerOffLampSelect');
+      btnPowerOffLampSelect.addEventListener('click', () => {
+        let lampSelect=Object.values(checkedDevices).filter(i => i.checked==true)
+        if (lampSelect.length>0) {
+          lampSelect.forEach(selectedLamp => {
+            const device=devicesByGateway.flatMap(contract => contract.devices).find(dev =>
+              dev.MemberID==selectedLamp.MemberID&&
+              dev.DeviceID==selectedLamp.DeviceID
+            );
+            console.log(device)
+            sendWs('controlOff', device)
+          });
+        } else {
+          const html=`<p>${translations.pleaseSelectLamp}</p>`
+          alertModal(html, 'warning')
+        }
+      })
+
+      let inputBright=document.getElementById('inputBrightSelect');
+      let btnSetBrightSelect=document.getElementById('btnSetBrightSelect');
+      btnSetBrightSelect.addEventListener('click', () => {
+        let lampSelect=Object.values(checkedDevices).filter(i => i.checked==true)
+        if (lampSelect.length>0) {
+          const brightValue=parseInt(inputBright.value, 10)
+          if (
+            inputBright&&
+            !isNaN(brightValue)&&
+            brightValue>=0&&brightValue<=100
+          ) {
+            lampSelect.forEach(selectedLamp => {
+              const device=devicesByGateway.flatMap(contract => contract.devices).find(dev =>
+                dev.MemberID==selectedLamp.MemberID&&
+                dev.DeviceID==selectedLamp.DeviceID
+              );
+              sendWs('controlBright', device, brightValue)
+            });
+          } else {
+            const html=`<p>${translations.inputBrightValue}</p>`
+            alertModal(html, 'warning')
+          }
+        } else {
+          const html=`<p>${translations.pleaseSelectLamp}</p>`
+          alertModal(html, 'warning')
+        }
+      })
+
+      let btnManageLampSelect=document.getElementById('btnManageLampSelect')
+      btnManageLampSelect.addEventListener('click', () => {
+        let lampSelect=Object.values(checkedDevices).filter(i => i.checked==true)
+        if (lampSelect.length>0) {
+          createLampModalBySelect(lampSelect)
+        } else {
+          const html=`<p>${translations.pleaseSelectLamp}</p>`
+          alertModal(html, 'warning')
+        }
+      })
+
+
+
+      setTimeout(() => {
+        paginatedData.forEach((device) => {
+          let lampModalBtn=document.getElementById('lamp-modal-btn'+device.MemberID+device.DeviceID);
+          const gateway=device.MemberID
+          lampModalBtn.addEventListener('click', () => {
+            createLampModal(device);
+          })
+        })
+      }, 0);
+
+    } else {
+      containerTable.innerHTML=''
+      containerTable.innerHTML=`
+        <div class="flex items-center justify-center w-full text-black dark:text-white">
+            <label class="font-normal break-all text-lg">${translations.noSearchReuslt}</label>
+        </div>`
+    }
+
+  }
+
+  function createLampModalBySelect(lampSelect) {
+
+    const nameLamp=lampSelect.map(selectedLamp => {
+      const device=devicesByGateway
+        .flatMap(contract => contract.devices)
+        .find(dev =>
+          dev.MemberID==selectedLamp.MemberID&&
+          dev.DeviceID==selectedLamp.DeviceID
+        );
+      return device.DeviceName? device.DeviceName:'Unknown Device';
+    }).join(', ');
+
+    const modalHTML=`<div id="lamp-modal" class="z-50 hidden bg-[#11182780] overflow-y-auto overflow-x-hidden fixed top-0 left-0 w-full h-full flex justify-end items-center z-30 dark:bg-[#111827e3]">
+            <div class="modal-content flex flex-col items-center justify-start shadow-2xl w-full max-w-md h-full animate-slideInRight">
+
+              <!-- header -->
+              <div class="w-full flex flex-col justify-center items-start p-6 border-b bg-gray-100 gap-1 dark:bg-[#1C1E1F] dark:border-b-gray-700">
+                 <h3 class="text-2xl font-semibold dark:text-white">${translations.manage} ${lampSelect.length} ${translations.lamp} </h3>
+                    <div class="w-full h-[32px] flex overflow-auto text-sm gap-1 dark:text-white">
+                           ${nameLamp}
+                      </div>
+                    </div>
+
+              <!-- content -->
+              <div class="w-full flex flex-1 flex-col justify-start items-start bg-white overflow-y-auto px-4 py-4 gap-4 dark:bg-[#141615]">
+                                        <div class="flex items-center justify-start gap-2 w-full">
+                                            <button class="w-[110px] h-[30px] bg-green-400 rounded-md font-semibold text-black" id="btnPowerOn">${translations.poweron}</button>
+                                            <button class="w-[110px] h-[30px] bg-red-400 rounded-md font-semibold text-black" id="btnPowerOff">${translations.poweroff}</button>
+                                        </div>
+                                        <div class="flex flex-col items-start gap-2 w-full">
+                                            <div class="flex space-x-2">
+                                                <h5 class=" text-black dark:text-white">${translations.brightness}</h5>
+                                                <h5 class=" text-black dark:text-white"><span id="rangeBrightnessValue">50</span>%</h5>
+                                            </div>
+                                        </div>
+                                        <div class="w-full flex flex-col justify-center space-y-2 pb-4 border-b">
+                                            <div class="w-full flex items-center">
+                                                <input id="rangeBrightness"value="50" min="0" max="100" type="range" 
+                                                class="inputRange"
+                                                style="background: linear-gradient(90deg, #3b82f6 ${(50-1)/(100-1)*100}%, #374151 ${(50-1)/(100-1)*100}%);" />
+                                            </div>
+                                            <div class="grid grid-cols-3 text-black dark:text-white">
+                                                <label class="text-left">0</label>
+                                                <label class="text-center">50</label>
+                                                <label class="text-end">100</label>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-md font-medium dark:text-white">${translations.AutomationSchedule}</h3>
+                                        <div class="w-full flex flex-row border-gray-200 dark:border-gray-700 bg-gray-200 rounded-2xl dark:bg-[#1C1E1F]">
+                                        <ul class="flex flex-col -mb-px text-sm font-medium text-left"
+                                            id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content" role="tablist">
+                                            ${translations.days.map((day, index) => {
+      let textColor=""
+      if (day.id==1) {
+        textColor="text-red-600"
+      } else if (day.id==2) {
+        textColor="text-yellow-400"
+      } else if (day.id==3) {
+        textColor="text-pink-600"
+      } else if (day.id==4) {
+        textColor="text-green-600"
+      } else if (day.id==5) {
+        textColor="text-orange-600"
+      } else if (day.id==6) {
+        textColor="text-cyan-600"
+      } else if (day.id==7) {
+        textColor="text-purple-600"
+      }
+      return `
+                                        <li class="" role="presentation">
+                                                    <button class="${textColor} text-start w-24 inline-block p-4 rounded-t-xl hover:rounded-tl-none hover:bg-white dark:hover:bg-[#141615]  ${index===0? "bg-white dark:bg-[#141615]":""}" 
+                                                    id="${day.id}-styled-tab" data-tabs-target="#styled-${day.id}" type="button" role="tab" aria-controls="${day.id}" ${index===0? 'aria-selected="true"':'aria-selected="false"'}>${day.name}</button>
+                                                </li>`}).join("")}
+                                        </ul>
+
+                                         <div id="default-styled-tab-content" class="w-full">
+                                             ${translations.days.map((day, index) => `
+                                            <div class="rounded-tr-2xl rounded-br-2xl shadow-[inset_7px_-6px_8px_-8px_rgba(71,_85,_105,_0.5)] ${index===0? "":"hidden"} w-full h-full p-4 bg-gray-200 dark:bg-[#1C1E1F]" id="styled-${day.id}" role="tabpanel" aria-labelledby="${day.id}">
+                                                <p class="text-sm mb-4 dark:text-white">${translations.setAutomation} <span class="font-semibold">${day.name}</span></p>
+                                                <form class="max-w-[16rem] mx-auto grid grid-cols-1 gap-4 sm:mx-0">
+                                                    <div>
+                                                        <label class="block mb-2 text-sm font-medium dark:text-white">${translations.startTime}:</label>
+                                                        <div class="relative">
+                                                            <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                            </div>
+                                                            <input type="time" id="start-time-${day.id}" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 block w-full p-2.5 dark:focus:ring-[#77DDFF]" value="00:00" required />
+                                                         </div>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block mb-2 text-sm font-medium dark:text-white">${translations.endTime}:</label>
+                                                        <div class="relative">
+                                                            <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                            </div>
+                                                            <input type="time" id="end-time-${day.id}" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purring-purple-500 block w-full p-2.5 dark:focus:ring-[#77DDFF]" value="00:00" required />
+                                                         </div>
+                                                    </div>
+                                                </form>
+                                            </div>`).join("")}
+                                        </div>
+                                </div>
+              </div>
+
+              <!-- footer -->
+              <div class="w-full flex flex-col-reverse items-center justify-center gap-2 p-6 border-t bg-gray-100 dark:bg-[#1C1E1F] dark:border-t-gray-700">
+                <button id="lamp-modal-cancel" type="button" class="w-full py-2 px-5 text-sm font-medium bg-red-400 text-gray-900 focus:outline-none rounded-lg hover:bg-gray-100 hover:text-purple-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">${translations.cancle}</button>
+                <button id="lamp-modal-save" type="button" class="w-full py-2 px-5 text-white bg-purple-700 hover:bg-purple-800 font-medium rounded-lg text-sm text-center dark:bg-blue-700 dark:hover:bg-blue-800">${translations.save}</button>
+              </div>
+            </div>`
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    // Select tabs container after the modal is inserted
+    const tabsContainer=document.querySelector(`#lamp-modal ul`);
+    const tabButtons=tabsContainer.querySelectorAll('[data-tabs-target]');
+    const tabContents=document.querySelectorAll(`#lamp-modal [role="tabpanel"]`);
+
+    // Add click events to tab buttons
+    tabButtons.forEach((tabButton) => {
+      tabButton.addEventListener('click', () => {
+        // Deactivate all tabs and content
+        tabButtons.forEach((btn) => {
+          btn.classList.remove('bg-gray-200', 'bg-white', 'dark:bg-[#1C1E1F]', 'dark:bg-[#141615]', 'active');
+          btn.classList.add('hover:bg-white', 'dark:hover:bg-[#141615]');
+        });
+        tabContents.forEach((content) => content.classList.add('hidden'));
+
+        // Activate the clicked tab and corresponding content
+        tabButton.classList.add('bg-white', 'active', 'rounded-tl-none', 'dark:bg-[#141615]');
+        tabButton.classList.remove('hover:bg-white', 'hover:dark:bg-[#141615]');
+        const targetId=tabButton.getAttribute('data-tabs-target');
+        const targetContent=document.querySelector(targetId);
+        targetContent.classList.remove('hidden');
+      });
+    });
+    animateModal(`lamp-modal`, 'open');
+    // click outside to close
+    document.getElementById('lamp-modal').addEventListener('click', (e) => {
+      if (e.target.id=='lamp-modal') {
+        animateModal(`lamp-modal`, 'close');
+      }
+    });
+    // click btn to close
+    document.getElementById('lamp-modal-cancel').addEventListener('click', () => {
+      animateModal(`lamp-modal`, 'close');
+    })
+
+    // click save
+    document.getElementById('lamp-modal-save').addEventListener('click', () => {
+      const dayTimes=translations.days.map((day) => {
+        const startTimeInput=document.getElementById(`start-time-${day.id}`);
+        const endTimeInput=document.getElementById(`end-time-${day.id}`);
+        return {
+          id: day.id,
+          name: day.name,
+          startTime: startTimeInput.value,
+          endTime: endTimeInput.value,
+        };
+      })
+
+
+      lampSelect.forEach(selectedLamp => {
+        const device=devicesByGateway.flatMap(contract => contract.devices).find(dev =>
+          dev.MemberID==selectedLamp.MemberID&&
+          dev.DeviceID==selectedLamp.DeviceID
+        );
+        const saveData={
+          MemberID: device.MemberID,
+          DeviceID: device.DeviceID,
+          schedule: dayTimes,
+        };
+        const schedule=JSON.parse(localStorage.getItem('schedule'))||{};
+
+        const deviceKey=`${device.MemberID}${device.DeviceID}`;
+        schedule[deviceKey]=saveData;
+
+        localStorage.setItem('schedule', JSON.stringify(schedule));
+
+        console.log('Saving schedule:', saveData);
+      });
+
+      const tableRows=dayTimes
+        .map((day) => `
+      <tr>
+        <td>${day.name}</td>
+        <td>${day.startTime}</td>
+        <td>${day.endTime}</td>
+      </tr>
+    `)
+        .join('');
+      const scheduleTable=`
+    <table border="1" style="width:100%; text-align:left; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>${translations.day}</th>
+          <th>${translations.startTime}</th>
+          <th>${translations.endTime}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+    </table>
+  `;
+      const html=`
+      <p>${translations.saveSuccess}</p>
+      <h3>${translations.scheduleDetails}:</h3>
+  ${scheduleTable}
+  `
+      alertModal(html, 'success')
+
+    })
+
+
+    const btnOn=document.getElementById(`btnPowerOn`);
+    const btnOff=document.getElementById(`btnPowerOff`);
+    btnOn.addEventListener('click', (e) => {
+      lampSelect.forEach(selectedLamp => {
+        const device=devicesByGateway.flatMap(contract => contract.devices).find(dev =>
+          dev.MemberID==selectedLamp.MemberID&&
+          dev.DeviceID==selectedLamp.DeviceID
+        );
+        sendWs('controlOn', device)
+      });
+    })
+
+    btnOff.addEventListener('click', (e) => {
+      lampSelect.forEach(selectedLamp => {
+        const device=devicesByGateway.flatMap(contract => contract.devices).find(dev =>
+          dev.MemberID==selectedLamp.MemberID&&
+          dev.DeviceID==selectedLamp.DeviceID
+        );
+        sendWs('controlOff', device)
+      })
+    })
+
+    const range=document.getElementById(`rangeBrightness`);
+    const activeColor="#3b82f6";
+    const inactiveColor="#374151";
+    range.addEventListener('input', (e) => {
+      const ratio=(e.target.value-e.target.min)/(e.target.max-e.target.min)*100;
+      e.target.style.background=`linear-gradient(90deg, ${activeColor} ${ratio}%, ${inactiveColor} ${ratio}%)`;
+      let label=document.getElementById(`rangeBrightnessValue`);
+      label.innerText=e.target.value;
+    })
+    range.addEventListener('change', (e) => {
+      lampSelect.forEach(selectedLamp => {
+        const device=devicesByGateway.flatMap(contract => contract.devices).find(dev =>
+          dev.MemberID==selectedLamp.MemberID&&
+          dev.DeviceID==selectedLamp.DeviceID
+        );
+        const value=e.target.value;
+        sendWs('controlBright', device, value)
+      })
+    })
+
+
+  }
+
+  function createLampModal(device) {
+    const gateway=device.MemberID;
+    const deviceKey=`${gateway}${device.DeviceID}`
+    const savedSchedule=JSON.parse(localStorage.getItem('schedule'))||{};
+
+    const modalHTML=`<div id="lamp-modal${gateway}${device.DeviceID}" class="z-50 hidden bg-[#11182780] overflow-y-auto overflow-x-hidden fixed top-0 left-0 w-full h-full flex justify-end items-center z-30 dark:bg-[#111827e3]">
+            <div class="modal-content flex flex-col items-center justify-start shadow-2xl w-full max-w-md h-full animate-slideInRight">
+
+              <!-- header -->
+              <div class="w-full flex items-center p-6 border-b bg-gray-100 gap-1 dark:bg-[#1C1E1F] dark:border-b-gray-700">
+                <h3 class="text-2xl font-semibold dark:text-white">${device.DeviceName} </h3>
+              </div>
+
+              <!-- content -->
+              <div class="w-full flex flex-1 flex-col justify-start items-start bg-white overflow-y-auto px-4 py-4 gap-4 dark:bg-[#141615]">
+                <h3 class="text-md font-medium dark:text-white">
+                                        <span id="badgeConfigOffline${gateway}${device.DeviceID}" class="${device.controls[0].LastValue==1? "hidden":"w-full"} bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                                        ${translations.offline}</span>
+                                        ${device.DeviceName} <span class="text-xs">#${device.DeviceID}</span> |
+                                        <span id="label${gateway}${device.DeviceID}" class="${device.controls[2].LastValue==1? "text-green-500":"text-red-500"}">
+                                            ${device.controls[2].LastValue==1? translations.poweron:translations.poweroff}
+                                        </span> 
+                                    </h3>
+                                        <div class="flex items-center justify-start gap-2 w-full">
+                                            <button class="w-[110px] h-[30px] bg-green-400 rounded-md font-semibold text-black" id="btnPowerOn${gateway}${device.DeviceID}" ${device.controls[0].LastValue==1? "":"disabled"}>${translations.poweron}</button>
+                                            <button class="w-[110px] h-[30px] bg-red-400 rounded-md font-semibold text-black" id="btnPowerOff${gateway}${device.DeviceID}" ${device.controls[0].LastValue==1? "":"disabled"}>${translations.poweroff}</button>
+                                        </div>
+                                        <div class="flex flex-col items-start gap-2 w-full">
+                                            <div class="flex space-x-2">
+                                                <h5 class=" text-black dark:text-white">${translations.brightness}</h5>
+                                                <h5 class=" text-black dark:text-white"><span id="rangeBrightnessValue${gateway}${device.DeviceID}">${device.controls[1].LastValue}</span>%</h5>
+                                            </div>
+                                        </div>
+                                        <div class="w-full flex flex-col justify-center space-y-2 pb-4 border-b">
+                                            <div class="w-full flex items-center">
+                                                <input id="rangeBrightness${gateway}${device.DeviceID}" ${device.controls[0].LastValue==1? "":"disabled"}
+                                                value="${device.controls[1].LastValue}" min="0" max="100" 
+                                                type="range" 
+                                                class="inputRange"
+                                                style="background: linear-gradient(90deg, #3b82f6 ${(device.controls[1].LastValue-1)/(100-1)*100}%, #374151 ${(device.controls[1].LastValue-1)/(100-1)*100}%);" />
+                                            </div>
+                                            <div class="grid grid-cols-3 text-black dark:text-white">
+                                                <label class="text-left">0</label>
+                                                <label class="text-center">50</label>
+                                                <label class="text-end">100</label>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-md font-medium dark:text-white">${translations.AutomationSchedule}</h3>
+                                        <div class="w-full flex flex-row border-gray-200 dark:border-gray-700 bg-gray-200 rounded-2xl dark:bg-[#1C1E1F]">
+                                        <ul class="flex flex-col -mb-px text-sm font-medium text-left"
+                                            id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content" role="tablist">
+                                            ${translations.days.map((day, index) => {
+      let textColor=""
+      if (day.id==1) {
+        textColor="text-red-600"
+      } else if (day.id==2) {
+        textColor="text-yellow-400"
+      } else if (day.id==3) {
+        textColor="text-pink-600"
+      } else if (day.id==4) {
+        textColor="text-green-600"
+      } else if (day.id==5) {
+        textColor="text-orange-600"
+      } else if (day.id==6) {
+        textColor="text-cyan-600"
+      } else if (day.id==7) {
+        textColor="text-purple-600"
+      }
+      return `
+                                        <li class="" role="presentation">
+                                                    <button class="${textColor} text-start w-24 inline-block p-4 rounded-t-xl hover:rounded-tl-none hover:bg-white dark:hover:bg-[#141615]  ${index===0? "bg-white dark:bg-[#141615]":""}" 
+                                                    id="${day.id}-styled-tab" data-tabs-target="#styled-${day.id}" type="button" role="tab" aria-controls="${day.id}" ${index===0? 'aria-selected="true"':'aria-selected="false"'}>${day.name}</button>
+                                                </li>`}).join("")}
+                                        </ul>
+
+                                         <div id="default-styled-tab-content" class="w-full">
+                                             ${translations.days.map((day, index) => `
+                                            <div class="rounded-tr-2xl rounded-br-2xl shadow-[inset_7px_-6px_8px_-8px_rgba(71,_85,_105,_0.5)] ${index===0? "":"hidden"} w-full h-full p-4 bg-gray-200 dark:bg-[#1C1E1F]" id="styled-${day.id}" role="tabpanel" aria-labelledby="${day.id}">
+                                                <p class="text-sm mb-4 dark:text-white">${translations.setAutomation} <span class="font-semibold">${day.name}</span></p>
+                                                <form class="max-w-[16rem] mx-auto grid grid-cols-1 gap-4 sm:mx-0">
+                                                    <div>
+                                                        <label class="block mb-2 text-sm font-medium dark:text-white">${translations.startTime}:</label>
+                                                        <div class="relative">
+                                                            <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                            </div>
+                                                            <input type="time" id="start-time-${day.id}" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 block w-full p-2.5 dark:focus:ring-[#77DDFF]" value="${savedSchedule[deviceKey]?.schedule[index]?.startTime||"00:00"}" required />
+                                                         </div>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block mb-2 text-sm font-medium dark:text-white">${translations.endTime}:</label>
+                                                        <div class="relative">
+                                                            <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                            </div>
+                                                            <input type="time" id="end-time-${day.id}" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purring-purple-500 block w-full p-2.5 dark:focus:ring-[#77DDFF]" value="${savedSchedule[deviceKey]?.schedule[index]?.endTime||"00:00"}" required />
+                                                         </div>
+                                                    </div>
+                                                </form>
+                                            </div>`).join("")}
+                                        </div>
+                                </div>
+              </div>
+
+              <!-- footer -->
+              <div class="w-full flex flex-col-reverse items-center justify-center gap-2 p-6 border-t bg-gray-100 dark:bg-[#1C1E1F] dark:border-t-gray-700">
+                <button id="lamp-modal-cancel${gateway}${device.DeviceID}" type="button" class="w-full py-2 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-red-400 rounded-lg hover:bg-gray-100 hover:text-purple-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">${translations.cancle}</button>
+                <button id="lamp-modal-save${gateway}${device.DeviceID}" type="button" class="w-full py-2 px-5 text-white bg-purple-700 hover:bg-purple-800 font-medium rounded-lg text-sm text-center dark:bg-blue-700 dark:hover:bg-blue-800">${translations.save}</button>
+              </div>
+            </div>`
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    // Select tabs container after the modal is inserted
+    const tabsContainer=document.querySelector(`#lamp-modal${gateway}${device.DeviceID} ul`);
+    const tabButtons=tabsContainer.querySelectorAll('[data-tabs-target]');
+    const tabContents=document.querySelectorAll(`#lamp-modal${gateway}${device.DeviceID} [role="tabpanel"]`);
+
+    // Add click events to tab buttons
+    tabButtons.forEach((tabButton) => {
+      tabButton.addEventListener('click', () => {
+        // Deactivate all tabs and content
+        tabButtons.forEach((btn) => {
+          btn.classList.remove('bg-gray-200', 'bg-white', 'dark:bg-[#1C1E1F]', 'dark:bg-[#141615]', 'active');
+          btn.classList.add('hover:bg-white', 'dark:hover:bg-[#141615]');
+        });
+        tabContents.forEach((content) => content.classList.add('hidden'));
+
+        // Activate the clicked tab and corresponding content
+        tabButton.classList.add('bg-white', 'active', 'rounded-tl-none', 'dark:bg-[#141615]');
+        tabButton.classList.remove('hover:bg-white', 'hover:dark:bg-[#141615]');
+        const targetId=tabButton.getAttribute('data-tabs-target');
+        const targetContent=document.querySelector(targetId);
+        targetContent.classList.remove('hidden');
+      });
+    });
+
+    const btnOn=document.getElementById(`btnPowerOn${gateway}${device.DeviceID}`);
+    const btnOff=document.getElementById(`btnPowerOff${gateway}${device.DeviceID}`);
+    btnOn.addEventListener('click', (e) => {
+      sendWs('controlOn', device)
+    })
+    btnOff.addEventListener('click', (e) => {
+      sendWs('controlOff', device)
+    })
+
+    const range=document.getElementById(`rangeBrightness${gateway}${device.DeviceID}`);
+    const activeColor="#3b82f6";
+    const inactiveColor="#374151";
+    range.addEventListener('input', (e) => {
+      const ratio=(e.target.value-e.target.min)/(e.target.max-e.target.min)*100;
+      e.target.style.background=`linear-gradient(90deg, ${activeColor} ${ratio}%, ${inactiveColor} ${ratio}%)`;
+      let label=document.getElementById(`rangeBrightnessValue${gateway}${device.DeviceID}`);
+      label.innerText=e.target.value;
+    })
+    range.addEventListener('change', (e) => {
+      // {"cmd":3,"param":{"Member":3,"Device":3001,"Ctrl":2,"V":0}}
+      const value=e.target.value;
+      sendWs('controlBright', device, value)
+    })
+
+
+
+    animateModal(`lamp-modal${gateway}${device.DeviceID}`, 'open');
+    // click save
+    document.getElementById('lamp-modal-save'+gateway+device.DeviceID).addEventListener('click', () => {
+      const dayTimes=translations.days.map((day) => {
+        const startTimeInput=document.getElementById(`start-time-${day.id}`);
+        const endTimeInput=document.getElementById(`end-time-${day.id}`);
+
+        return {
+          id: day.id,
+          name: day.name,
+          startTime: startTimeInput.value,
+          endTime: endTimeInput.value,
+        };
+      })
+
+      const saveData={
+        GatewayID: gateway,
+        DeviceID: device.DeviceID,
+        schedule: dayTimes,
+      };
+
+      const schedule=JSON.parse(localStorage.getItem('schedule'))||{};
+
+      const deviceKey=`${gateway}${device.DeviceID}`;
+      schedule[deviceKey]=saveData;
+
+      localStorage.setItem('schedule', JSON.stringify(schedule));
+
+      console.log('Saving schedule:', saveData);
+
+      const tableRows=dayTimes
+        .map((day) => `
+      <tr>
+        <td>${day.name}</td>
+        <td>${day.startTime}</td>
+        <td>${day.endTime}</td>
+      </tr>
+    `)
+        .join('');
+      const scheduleTable=`
+    <table border="1" style="width:100%; text-align:left; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>${translations.day}</th>
+          <th>${translations.startTime}</th>
+          <th>${translations.endTime}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+    </table>
+  `;
+      const html=`
+      <p>${translations.saveSuccess}</p>
+      <h3>${translations.scheduleDetails}:</h3>
+  ${scheduleTable}
+  `
+      alertModal(html, 'success')
+    })
+    // click outside to close
+    document.getElementById('lamp-modal'+gateway+device.DeviceID).addEventListener('click', (e) => {
+      if (e.target.id=='lamp-modal'+gateway+device.DeviceID) {
+        animateModal(`lamp-modal${gateway}${device.DeviceID}`, 'close');
+      }
+    });
+    // click btn to close
+    document.getElementById('lamp-modal-cancel'+gateway+device.DeviceID).addEventListener('click', () => {
+      animateModal(`lamp-modal${gateway}${device.DeviceID}`, 'close');
+    })
+  }
+
+
+
+  function animateModal(elementId, action) {
+    const element=document.getElementById(elementId);
+    if (!element) return;
+
+    if (action==='open') {
+      element.classList.remove('hidden');
+      element.querySelector('.modal-content').classList.add('animate-slideInRight');
+      element.querySelector('.modal-content').classList.remove('animate-slideOutRight');
+    } else if (action==='close') {
+      const modalContent=element.querySelector('.modal-content');
+      modalContent.classList.remove('animate-slideInRight');
+      modalContent.classList.add('animate-slideOutRight');
+
+      // Wait for the animation to finish before hiding the element
+      modalContent.addEventListener('animationend', () => {
+        element.remove()
+      }, {
+        once: true
+      });
+    }
+  }
+
+
+
+
+
+  // pagination
+  let currentPage=1;
+  let itemsPerPage=10;
+
+  function getPaginatedData(data) {
+    const startIndex=(currentPage-1)*itemsPerPage;
+    const endIndex=startIndex+itemsPerPage;
+    return data.slice(startIndex, endIndex);
+  }
+
+  function renderPaginationControls() {
+    const paginationControlsTop=document.getElementById('paginationControlsTop')
+    const paginationControlsBottom=document.getElementById('paginationControlsBottom')
+
+    const totalPages=Math.ceil(allDevices.length/itemsPerPage);
+
+    const startItem=(currentPage-1)*itemsPerPage+1;
+    const endItem=Math.min(currentPage*itemsPerPage, allDevices.length);
+
+    const currentPageDevices=allDevices.slice(startItem, endItem);
+
+    const showData=[10, 15, 20];
+
+    let createPaginationControls=`<div class="flex items-center justify-start gap-2 sm:justify-start">
+                          <select data-pagination="selectPerPage"
+                              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-18 py-1 px-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+              ${showData.map((i) =>
+      `<option value="${i}" ${i==itemsPerPage? 'selected':''}>${i}</option>`
+    ).join('')}
+                          </select>
+                          <label class="block text-sm dark:text-white">/ <%= i18n.__('page') %></label>
+                      </div>
+                      <div class="flex items-center justify-end gap-2">
+                          <span class="text-sm">${startItem}-${endItem} <%= i18n.__('of') %> ${allDevices.length}</span>
+                          <a href="#" data-pagination="prevPage"
+                              class="flex items-center justify-center h-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg py-1 px-2 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"><i
+                                  class='bx bxs-chevron-left'></i></a>
+                          <div class="flex items-center justify-center text-sm w-[32px]"><span>${currentPage}/${totalPages}</span></div>
+                          <a href="#" data-pagination="nextPage"
+                              class="flex items-center justify-center h-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg py-1 px-2 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"><i
+                                  class='bx bxs-chevron-right'></i></a>
+                      </div>`
+
+    paginationControlsTop.innerHTML=createPaginationControls
+    paginationControlsBottom.innerHTML=createPaginationControls
+
+    const selectPerPage=document.querySelectorAll('[data-pagination="selectPerPage"]')
+    selectPerPage.forEach((data) => {
+      data.addEventListener('change', (e) => {
+        itemsPerPage=parseInt(e.target.value);
+        currentPage=1;
+        displayDataToTable();
+      })
+    })
+
+    const prevPage=document.querySelectorAll('[data-pagination="prevPage"]')
+    prevPage.forEach((data) => {
+      data.addEventListener('click', () => {
+        if (currentPage>1) {
+          currentPage--;
+          displayDataToTable();
+        }
+      })
+    })
+
+    const nextPage=document.querySelectorAll('[data-pagination="nextPage"]')
+    nextPage.forEach((data) => {
+      data.addEventListener('click', () => {
+        if (currentPage<totalPages) {
+          currentPage++;
+          displayDataToTable();
+        }
+      })
+    })
+
+  }
+
+
+  function connectWS() {
+    ws=new WebSocket("ws://localhost:8000/echo");
+    // ws=new WebSocket("wss://archismarthome.com:8000/echo");
+    console.log("Connection : "+ws.url);
+
+    ws.onmessage=(event) => {
+      // console.log("data : "+event.data);
+      const obj=JSON.parse(event.data);
+      checkCommand(obj.cmd, obj.param);
+    }
+    ws.onopen=(event) => {
+      console.log("onopen : "+JSON.stringify(event));
+      sendLogin();
+    }
+    ws.onclose=(event) => {
+      console.log("onclose : code("+event.code+"), reason("+event.reason+")");
+    }
+  }
+
+  function sendLogin() {
+    const data=JSON.stringify({ "cmd": 1, "param": { "Username": "bird", "Password": "123456789" } })
+    ws.send(data);
+  }
+
+  function checkCommand(cmd, payload) {
+    console.log("Command:"+cmd);
+    if (cmd==1) {
+      // res.LoginResult
+      if (payload.Success==1) {
+        // getFriendInformation();
+      }
+      console.log("Login :"+(payload.Success==1? "Logedin":"Failed"));
+    } else if (cmd==34) {
+      // res.FriendInformation
+      const { Member, Message, Success }=payload
+      if (Member!=undefined) {
+        // initData(Member)
+      }
+    } else if (cmd==31) {
+      const { Ctrl, Device, Member, V }=payload
+      console.log({ Ctrl, Device, Member, V })
+      const gateway=devicesByGateway.find(dev => dev.GatewayID==Member);
+      if (gateway!=null) {
+        const dev=gateway.devices.find(dev => dev.DeviceID==Device)
+        if (dev!=null) {
+          if (dev.DeviceStyleID==3) {
+            if (Ctrl==0) {
+              // online offline
+              dev.controls[0].LastValue=V;
+              const statusLabel=document.getElementById(`status${gateway.GatewayID}${dev.DeviceID}`)
+              if (statusLabel) {
+                if (V==0) {
+                  statusLabel.innerText=translations.offline;
+                  updateClass(statusLabel, 'text-green-500', 'text-red-500');
+                } else {
+                  statusLabel.innerText=translations.online;
+                  updateClass(statusLabel, 'text-red-500', 'text-green-500');
+                }
+              } else {
+                console.warn(`Status label for GatewayID: ${gateway.GatewayID} and DeviceID: ${dev.DeviceID} not found.`);
+              }
+              const elements=[
+                document.getElementById(`btnPowerOn${Member}${Device}`),
+                document.getElementById(`btnPowerOff${Member}${Device}`),
+                document.getElementById(`rangeBrightness${Member}${Device}`),
+              ]
+              const validElements=elements.filter(el => el!==null);
+              if (validElements.length>0) {
+                validElements.forEach(element => {
+                  V==0? element.disabled=true:element.disabled=false;
+                });
+              }
+            } else if (Ctrl==2) {
+              // status on-off
+              dev.controls[2].LastValue=V;
+              const elements=[
+                document.getElementById(`power${gateway.GatewayID}${dev.DeviceID}`),
+                document.getElementById(`label${gateway.GatewayID}${dev.DeviceID}`),
+              ];
+              const validElements=elements.filter(el => el!==null);
+              if (validElements.length>0) {
+                validElements.forEach(element => {
+                  if (V==0) {
+                    element.innerText=translations.poweroff;
+                    updateClass(element, 'text-green-500', 'text-red-500');
+                  } else {
+                    element.innerText=translations.poweron;
+                    updateClass(element, 'text-red-500', 'text-green-500');
+                  }
+                });
+              }
+            } else if (Ctrl==1) {
+              // brightness
+              if (dev.controls[1].LastValue!=V)
+                dev.controls[1].LastValue=V;
+              const activeColor="#3b82f6";
+              const inactiveColor="#374151";
+              const elements=[
+                document.getElementById(`bright${gateway.GatewayID}${dev.DeviceID}`),
+                document.getElementById(`rangeBrightnessValue${gateway.GatewayID}${dev.DeviceID}`),
+                document.getElementById(`rangeBrightness${gateway.GatewayID}${dev.DeviceID}`),
+              ];
+              const validElements=elements.filter(el => el!==null);
+              if (validElements.length>0) {
+                validElements.forEach(element => {
+                  element.innerText=V;
+                  element.value=V
+                  const ratio=(element.value-element.min)/(element.max-element.min)*100;
+                  element.style.background=`linear-gradient(90deg, ${activeColor} ${ratio}%, ${inactiveColor} ${ratio}%)`;
+                })
+              }
+            }
+          }
+        }
+      }
+    } else if (cmd==99) {
+      const { Status, Message }=payload
+      if (Status==0) {
+        const html=`<p>${translations.cmdOffline}</p>`;
+        alertModal(html, 'error')
+      }
+    }
+  }
+
+  function sendWs(type, device, value) {
+
+    if (type==='controlOn') {
+      let dataBright;
+      let dataOnOff;
+      const bright=device.controls[1]?.LastValue;
+      if (bright==0) {
+        dataBright=JSON.stringify({
+          cmd: 3,
+          param: { Member: device.MemberID, Device: device.DeviceID, Ctrl: 1, V: 100 },
+        });
+        dataOnOff=JSON.stringify({
+          cmd: 3,
+          param: { Member: device.MemberID, Device: device.DeviceID, Ctrl: 2, V: 1 },
+        });
+      } else {
+        dataBright=JSON.stringify({
+          cmd: 3,
+          param: { Member: device.MemberID, Device: device.DeviceID, Ctrl: 1, V: bright },
+        });
+        dataOnOff=JSON.stringify({
+          cmd: 3,
+          param: { Member: device.MemberID, Device: device.DeviceID, Ctrl: 2, V: 1 },
+        });
+      }
+      ws.send(dataBright);
+      ws.send(dataOnOff);
+    } else if (type==='controlOff') {
+      const dataOnOff=JSON.stringify({ "cmd": 3, "param": { "Member": device.MemberID, "Device": device.DeviceID, "Ctrl": 2, "V": 0 } })
+      ws.send(dataOnOff)
+    } else if (type=='controlBright') {
+      let dataBright;
+      let dataOnOff;
+      if (value==0) {
+        dataBright=JSON.stringify({ "cmd": 3, "param": { "Member": device.MemberID, "Device": device.DeviceID, "Ctrl": 1, "V": value } })
+        dataOnOff=JSON.stringify({ "cmd": 3, "param": { "Member": device.MemberID, "Device": device.DeviceID, "Ctrl": 2, "V": 0 } })
+      } else {
+        dataBright=JSON.stringify({ "cmd": 3, "param": { "Member": device.MemberID, "Device": device.DeviceID, "Ctrl": 1, "V": value } })
+        dataOnOff=JSON.stringify({ "cmd": 3, "param": { "Member": device.MemberID, "Device": device.DeviceID, "Ctrl": 2, "V": 1 } })
+      }
+      ws.send(dataBright)
+      ws.send(dataOnOff)
+    }
+    else {
+      console.error('Invalid type specified:', type);
+      return;
+    }
+
+  }
+
+  function alertModal(html, icon) {
+    Swal.fire({
+      html: html,
+      icon: icon,
+      confirmButtonText: translations.ok,
+      customClass: {
+        confirmButton: 'bg-purple-700 dark:bg-blue-700 text-white px-4 py-2 rounded-lg',
+      },
+    })
+  }
+
+  function updateClass(element, removeClass, addClass) {
+    if (element) {
+      element.classList.remove(removeClass);
+      element.classList.add(addClass);
+    } else {
+      console.error("Element not found");
+    }
+  }
+
+
+
+</script>
+
+
+
+<!-- AIzaSyBYZDA2s7REmeois7IiulX5lW7F1JnaP4o -->

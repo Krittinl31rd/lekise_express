@@ -1,0 +1,120 @@
+[
+    {
+        "SiteID": 1,
+        "ContractID": 1,
+        "GatewayID": 5,
+        "ContractNumber": "TH20240001",
+        "devices": [
+            {
+                "MemberID": 5,
+                "DeviceID": 2004,
+                "DeviceStyleID": 3,
+                "DeviceName": "dim 4",
+                "DeviceStatusText": null,
+                "Latitude": "13.775524086969234",
+                "Longitude": "100.60805185379095",
+                "controls": [
+                    {
+                        "MemberID": 5,
+                        "DeviceID": 2004,
+                        "ControlID": 0,
+                        "ConTypeID": 0,
+                        "IsCustomIMG": false,
+                        "Label": "online",
+                        "LastValue": 1,
+                        "Created": "2020-06-09T09:49:16.040Z"
+                    },
+                    {
+                        "MemberID": 5,
+                        "DeviceID": 2004,
+                        "ControlID": 1,
+                        "ConTypeID": 1,
+                        "IsCustomIMG": false,
+                        "Label": "dimmer",
+                        "LastValue": 100,
+                        "Created": "2020-06-09T09:49:16.040Z"
+                    },
+                    {
+                        "MemberID": 5,
+                        "DeviceID": 2004,
+                        "ControlID": 2,
+                        "ConTypeID": 0,
+                        "IsCustomIMG": false,
+                        "Label": "status",
+                        "LastValue": 0,
+                        "Created": "2021-04-22T13:27:02.123Z"
+                    },
+                    {
+                        "MemberID": 5,
+                        "DeviceID": 2004,
+                        "ControlID": 100,
+                        "ConTypeID": 1,
+                        "IsCustomIMG": false,
+                        "Label": "room",
+                        "LastValue": 4,
+                        "Created": "2020-06-09T09:49:16.040Z"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "SiteID": 1,
+        "ContractID": 3,
+        "GatewayID": 1018,
+        "ContractNumber": "TH20240002",
+        "devices": [
+            {
+                "MemberID": 1018,
+                "DeviceID": 2014,
+                "DeviceStyleID": 3,
+                "DeviceName": "Dim 14",
+                "DeviceStatusText": null,
+                "Latitude": "13.773963651912077",
+                "Longitude": "100.60857756676134",
+                "controls": [
+                    {
+                        "MemberID": 1018,
+                        "DeviceID": 2014,
+                        "ControlID": 0,
+                        "ConTypeID": 0,
+                        "IsCustomIMG": false,
+                        "Label": "Online",
+                        "LastValue": 1,
+                        "Created": "2023-04-10T11:04:37.877Z"
+                    },
+                    {
+                        "MemberID": 1018,
+                        "DeviceID": 2014,
+                        "ControlID": 1,
+                        "ConTypeID": 1,
+                        "IsCustomIMG": false,
+                        "Label": "Dimmer",
+                        "LastValue": 100,
+                        "Created": "2023-04-10T11:04:37.877Z"
+                    },
+                    {
+                        "MemberID": 1018,
+                        "DeviceID": 2014,
+                        "ControlID": 2,
+                        "ConTypeID": 1,
+                        "IsCustomIMG": false,
+                        "Label": "Status",
+                        "LastValue": 0,
+                        "Created": "2023-04-10T11:04:37.880Z"
+                    },
+                    {
+                        "MemberID": 1018,
+                        "DeviceID": 2014,
+                        "ControlID": 100,
+                        "ConTypeID": 1,
+                        "IsCustomIMG": false,
+                        "Label": "Room",
+                        "LastValue": 3,
+                        "Created": "2023-04-10T11:04:37.883Z"
+                    }
+                ]
+            }
+        ]
+    }
+]

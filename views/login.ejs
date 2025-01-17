@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/cstyle.css" rel="stylesheet">
+    <!-- <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script> -->
+    <!-- <script src="/js/OneSignalSDK.js" defer></script> -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
+    <title>
+        <%= title %>
+    </title>
+</head>
+
+<body class="font-poppins">
+
+    <div class="flex flex-col items-center justify-center min-h-screen bg-black">
+        <% if (messages.error) { %>
+            <div class="bg-red-100 border border-red-400 text-red-700 pl-4 pr-12 py-3 mr-2 rounded relative animate-fade-in-down transition-opacity duration-500 ease-out"
+                role="alert">
+                <span class="block sm:inline">
+                    <%= messages.error %>
+                </span>
+                <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3"
+                    onclick="this.parentElement.style.display='none';">
+                    <svg class="fill-current h-6 w-6 text-red-700" role="button" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path
+                            d="M14.348 5.652a.5.5 0 00-.707 0L10 9.293 6.36 5.652a.5.5 0 10-.707.707L9.293 10l-3.64 3.64a.5.5 0 00.707.707L10 10.707l3.641 3.64a.5.5 0 00.707-.707L10.707 10l3.64-3.641a.5.5 0 000-.707z" />
+                    </svg>
+                </button>
+            </div>
+            <% } %>
+                <div
+                    class="relative flex flex-col m-6 space-y-8 rounded-3xl md:flex-row md:space-y-0 bg-gradient-to-b from-[#212121] to-[#010101]
+                    animate-fade-in-down transition-opacity duration-500 ease-out">
+
+                    <div class="flex flex-col justify-center items-center p-10 space-y-2 ">
+
+                        <img src="./images/logo.png" alt="" class="h-32 w-64 object-contain mb-6">
+
+                        <span class="text-4xl font-semibold text-[#6E40FF]">
+                            <%= i18n.__('logintodashboard') %>
+                        </span>
+                        <span class="font-light text-gray-300 text-center" id="map">
+                            <%= i18n.__('pleaseenteryourdetails') %>
+                        </span>
+
+                        <form action="/api/login" method="post" class="w-full">
+                            <div class="py-2 w-full">
+                                <span class="mb-2 text-md text-white">
+                                    <%= i18n.__('email') %>
+                                </span>
+                                <input type="email" placeholder="<%= i18n.__('enteryouremail') %>" name="email" required
+                                    class="w-full p-3 rounded-md focus:ring-0  border-gray-300 placeholder:font-light placeholder:text-gray-500">
+                            </div>
+                            <div class="py-2 w-full">
+                                <span class="mb-2 text-md text-white">
+                                    <%= i18n.__('password') %>
+                                </span>
+                                <input type="password" placeholder="<%= i18n.__('enteryourpassword') %>" name="password" required
+                                    class="w-full p-3 rounded-md focus:ring-0  border-gray-300 placeholder:font-light placeholder:text-gray-500">
+                            </div>
+
+                            <div class="py-2 w-full">
+                                <button
+                                    class="w-full bg-gradient-to-br from-[#6E40FF] to-[#3005AC] text-white rounded-lg p-2 font-semibold text-xl flex items-center justify-center">
+                                    <i class='bx bx-arrow-to-right mr-2'></i>
+                                    <%= i18n.__('login') %>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="relative">
+                        <img src="./images/highway.jpg" alt=""
+                            class="w-[400px] h-full hidden md:block rounded-r-xl object-cover">
+                        <div
+                            class="absolute hidden bottom-5 right-6 p-6 bg-purple-700/10 rounded-r-xl backdrop-blur-sm drop-shadow-lg md:block">
+                            <span class="text-white font-semibold text-xl">Login to Dashboard LeKise</span>
+                            <br>
+                            <span class="text-black font-medium text-sm">COPYRIGHTS © 2024 Company, ALL RIGHTS
+                                RESERVED</span>
+                        </div>
+                    </div>
+                </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+</body>
+
+</html>

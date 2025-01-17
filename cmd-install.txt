@@ -1,0 +1,14 @@
+npm init -y
+
+-- server --
+npm install express morgan cors nodemon bcryptjs jsonwebtoken
+
+-- client --
+npm install ejs
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+-- database --
+npm install sequelize mysql2
+
+
