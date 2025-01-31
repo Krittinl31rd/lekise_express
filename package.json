@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "apexcharts": "^4.4.0",
     "bcryptjs": "^2.4.3",
     "boxicons": "^2.1.4",
     "cookie-parser": "^1.4.7",
@@ -26,7 +27,8 @@
     "morgan": "^1.10.0",
     "mssql": "^11.0.1",
     "mysql2": "^3.11.4",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "sweetalert2": "^11.15.10"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",

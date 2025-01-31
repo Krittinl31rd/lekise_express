@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,17 +13,18 @@
         test
     </title>
 </head>
+
 <body>
     <div class="p-8">
         <button id="broadcastButton" class="py-2 px-4 bg-blue-600 rounded-xl">Send UDP Broadcast</button>
-    
+
         <div id="response" class="mt-5 grid grid-cols-4 gap-4">
-    
+
         </div>
     </div>
-    
-    
-    
+
+
+
     <script>
         const socket=new WebSocket('ws://localhost:8080');
 
@@ -33,22 +34,30 @@
 
         socket.addEventListener('message', (event) => {
             const responseDiv=document.getElementById('response');
-            const data=JSON.parse(event.data);
-            const card=data.map((i) => {
-                return `
+            const data=JSON.parse(event.data); 
+            const payload=data?.payload;
+            if (payload.length>0) {
+                const card=payload.map((i) => {
+                    return `
                 <a href="#"class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${i.address} <span class="text-xs">${i.port}</span></h5>
-                    <p class="font-normal text-gray-700 dark:text-gray-400">${i.message}</p>
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${i.deviceInfo.Name}</h5>
+                    <p class="font-normal text-gray-700 dark:text-gray-400">RoomID: ${i.deviceInfo.RoomID}</p>
                 </a>
                 `
-            }).join('');
-            responseDiv.innerHTML=card;
+                }).join('');
+                responseDiv.innerHTML=card;
+            } else {
+                responseDiv.innerHTML=`
+                   <p class="text-center text-2xl text-gray-700 dark:text-gray-400 col-span-4">No found :)</p>
+                  `
+            }
         });
 
         // Send the 'broadcast' message to the server when the button is clicked
         document.getElementById('broadcastButton').addEventListener('click', () => {
             if (socket.readyState===WebSocket.OPEN) {
-                socket.send(JSON.stringify({ cmd: 1 }));
+                         socket.send(JSON.stringify({ cmd: 'login' }));
+                socket.send(JSON.stringify({ cmd: 'scan' }));
                 console.log('Sent broadcast command');
             } else {
                 console.error('WebSocket connection is not open');
@@ -56,5 +65,5 @@
         });
     </script>
 </body>
-</html>
 
+</html>

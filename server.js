@@ -23,6 +23,12 @@ i18n.configure({
     cookie: 'lang', // Language stored in cookies
 });
 
+// Serve static files from the "public" directory
+app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, "node_modules")));
+app.use("/icons", express.static(path.join(__dirname, "node_modules/boxicons")));
+
+// Middleware  for server
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json({ limit: "20mb" }));
@@ -37,12 +43,6 @@ app.use(
     })
 );
 app.use(flash());
-
-// Serve static files from the "public" directory
-app.use(express.static('public'));
-app.use("/icons", express.static(path.join(__dirname, "node_modules/boxicons")));
-
-// Middleware to set locale from query or cookies
 app.use(i18n.init);
 app.use((req, res, next) => {
     const lang = req.query.lang || req.cookies.lang || i18n.getLocale();
@@ -52,7 +52,6 @@ app.use((req, res, next) => {
     res.locals.i18n = i18n;
     next();
 });
-
 
 // Templating
 app.use(expressLayout);

@@ -1,0 +1,35 @@
+ // function manageMenuDataBeforeDisplay() {
+    //     inputSearchShow.innerHTML=''
+    //     let getSearchValue=getSearchInputValue.value;
+    //     getDeviceNameValue=selectDeviceName.value;
+    //     getMemberNameValue=selectMemberName.value;
+
+    //     if (getSearchValue==""||getSearchValue==null) {
+    //         if (getLogTypeValue['usage']?.checked==true&&getLogTypeValue['error']?.checked==true&&getLogTypeValue['issue']?.checked==true
+    //             &&getDeviceNameValue=="all"&&getMemberNameValue=="all"
+    //         ) {
+    //             dataLogsFilter=allDataLogs
+    //         } else if (getLogTypeValue['usage']?.checked==true&&getLogTypeValue['error']?.checked==true&&getLogTypeValue['issue']?.checked==true
+    //             &&getDeviceNameValue!="all"&&getMemberNameValue!="all"
+    //         ) {
+    //             dataLogsFilter=allDataLogs.filter((data) => data.DeviceName==getDeviceNameValue&&data.MemberName==getMemberNameValue)
+    //         } else if (getLogTypeValue['usage']?.checked==true&&getLogTypeValue['error']?.checked==true&&getLogTypeValue['issue']?.checked!=true) {
+    //             dataLogsFilter=allDataLogs.filter((data) => data.LogType=='usage'||data.LogType=='error')
+    //         } else if (getLogTypeValue['usage']?.checked==true&&getLogTypeValue['error']?.checked!=true&&getLogTypeValue['issue']?.checked==true) {
+    //             dataLogsFilter=allDataLogs.filter((data) => data.LogType=='usage'||data.LogType=='issue')
+    //         } else if (getLogTypeValue['usage']?.checked!=true&&getLogTypeValue['error']?.checked==true&&getLogTypeValue['issue']?.checked==true) {
+    //             dataLogsFilter=allDataLogs.filter((data) => data.LogType=='error'||data.LogType=='issue')
+    //         } else if (getLogTypeValue['usage']?.checked==true&&getLogTypeValue['error']?.checked!=true&&getLogTypeValue['issue']?.checked!=true) {
+    //             dataLogsFilter=allDataLogs.filter((data) => data.LogType=='usage')
+    //         } else if (getLogTypeValue['usage']?.checked!=true&&getLogTypeValue['error']?.checked==true&&getLogTypeValue['issue']?.checked!=true) {
+    //             dataLogsFilter=allDataLogs.filter((data) => data.LogType=='error')
+    //         } else if (getLogTypeValue['usage']?.checked!=true&&getLogTypeValue['error']?.checked!=true&&getLogTypeValue['issue']?.checked==true) {
+    //             dataLogsFilter=allDataLogs.filter((data) => data.LogType=='issue')
+    //         } else {
+    //             dataLogsFilter=allDataLogs
+    //         }
+    //     } else {
+
+    //     }
+    //     displayDataToTable();
+    // }

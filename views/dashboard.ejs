@@ -1,4 +1,5 @@
-<div id="dashboardOverview" class="flex-1 overflow-auto space-y-4 p-4 animate-fade-in-down transition-opacity duration-500 ease-out">
+<div id="dashboardOverview"
+    class="flex-1 overflow-y-auto overflow-x-hidden space-y-4 p-4 animate-fade-in-down transition-opacity duration-500 ease-out">
 
     <div
         class="px-[24px] border-gray-200 dark:border-gray-800 border-[1px] rounded-[16px] grid grid-cols-2 md:grid-cols-4">
@@ -54,120 +55,276 @@
     </div>
 
     <div class="grid">
-        <div class="w-[300px] h-[300px]">
-            <canvas id="deviceStatusPieChart"></canvas>
+
+        <div class="w-full bg-white rounded-lg shadow border dark:bg-black dark:border-gray-800 p-4">
+
+            <div id="chart"></div>
+
         </div>
+
     </div>
+
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/apexcharts/dist/apexcharts.min.js"></script>
 <script>
-
-    var translations={
+    // Constants
+    const TRANSLATIONS={
         device: "<%= i18n.__('device') %>",
         online: "<%= i18n.__('online') %>",
         offline: "<%= i18n.__('offline') %>",
-        device: "<%= i18n.__('device') %>",
+        usage: "<%= i18n.__('usage') %>",
+        error: "<%= i18n.__('error') %>",
+        issue: "<%= i18n.__('issue') %>",
+        LogsStatistics: "<%= i18n.__('LogsStatistics') %>"
     };
 
-    let devicesByGateway=[]
+    const CHART_COLORS={
+        dark: ['#10b981', '#ef4444', '#f59e0b'],
+        light: ['#16a34a', '#dc2626', '#f59e0b']
+    };
 
+    // Dashboard state using a simple state management pattern
+    class DashboardState {
+        constructor() {
+            this.devicesByGateway=[];
+            this.allDataLogs=[];
+            this.charts=[];
+        }
 
-    async function getData() {
-        let allDataList= <%- JSON.stringify(data)%>;
-        const siteData=allDataList.devices.filter(item => item.GatewayID!==undefined);
-        const deviceData=allDataList.devices.filter(item => item.MemberID!==undefined);
-
-        siteData.forEach(site => {
-            const matchingDevices=deviceData.filter(device => device.MemberID===site.GatewayID);
-            devicesByGateway.push({
-                ...site,
-                devices: matchingDevices
-            });
-        });
-        // let allDevices=[]
-        // allDevices=devicesByGateway.flatMap(contract => contract.devices)
-    }
-
-
-    getData()
-        .then(() => {
-            console.log(devicesByGateway)
-            generateDashboard()
-        })
-        .catch((err) => console.log(err));
-
-
-    function generateDashboard() {
-        let totalOnline=0;
-        let totalOffline=0;
-
-        const contractNumbers=[];
-        const onlineCounts=[];
-        const offlineCounts=[];
-
-        devicesByGateway.forEach((contract) => {
-            let contractOnline=0;
-            let contractOffline=0;
-
-            contract.devices.forEach((device) => {
-                device.controls.forEach((control) => {
-                    if (control.Label.toLowerCase()==='online') {
-                        if (control.LastValue===1) contractOnline++;
-                        else if (control.LastValue===0) contractOffline++;
-                    }
-                });
-            });
-
-            totalOnline+=contractOnline;
-            totalOffline+=contractOffline;
-
-            // Prepare devicesByGateway for chart
-            contractNumbers.push(contract.ContractNumber);
-            onlineCounts.push(contractOnline);
-            offlineCounts.push(contractOffline);
-        });
-
-        document.getElementById('total-contracts').textContent=devicesByGateway.length;
-        document.getElementById('total-devices').textContent=devicesByGateway.reduce((sum, contract) => sum+contract.devices.length, 0);
-        document.getElementById('total-online').textContent=totalOnline;
-        document.getElementById('total-offline').textContent=totalOffline;
-
-        // Create the Pie Chart
-        const ctxPie=document.getElementById('deviceStatusPieChart').getContext('2d');
-        const deviceStatusPieChart=new Chart(ctxPie, {
-            type: 'doughnut',
-            data: {
-                labels: [translations.online, translations.offline],
-                datasets: [{
-                    data: [totalOnline, totalOffline], // Total Online and Offline devices
-                    backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)'],
-                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (tooltipItem) {
-                                return `${tooltipItem.label}: ${tooltipItem.raw}`;
-                            }
-                        }
-                    }
-                }
+        // Memoized device status counting
+        #deviceStatusCache=new WeakMap();
+        getDeviceStatus(devices) {
+            if (this.#deviceStatusCache.has(devices)) {
+                return this.#deviceStatusCache.get(devices);
             }
-        });
 
+            const status=devices.reduce((acc, device) => {
+                const onlineControl=device.controls.find(
+                    control => control.Label.toLowerCase()==='online'
+                );
 
+                if (onlineControl) {
+                    onlineControl.LastValue===1? acc.online++:acc.offline++;
+                }
 
+                return acc;
+            }, { online: 0, offline: 0 });
+
+            this.#deviceStatusCache.set(devices, status);
+            return status;
+        }
     }
 
+    class DataProcessor {
+        static processDeviceData(devices) {
+            const [siteData, deviceData]=devices.reduce((acc, item) => {
+                acc[item.GatewayID!==undefined? 0:1].push(item);
+                return acc;
+            }, [[], []]);
 
+            return siteData.map(site => ({
+                ...site,
+                devices: deviceData.filter(device => device.MemberID===site.GatewayID)
+            }));
+        }
+
+        static aggregateContractData(devicesByGateway, getDeviceStatus) {
+            return devicesByGateway.reduce((acc, contract) => {
+                const status=getDeviceStatus(contract.devices);
+
+                return {
+                    totalOnline: acc.totalOnline+status.online,
+                    totalOffline: acc.totalOffline+status.offline,
+                    contractData: [...acc.contractData, {
+                        number: contract.ContractNumber,
+                        ...status
+                    }]
+                };
+            }, {
+                totalOnline: 0,
+                totalOffline: 0,
+                contractData: []
+            });
+        }
+
+        static processLogDates(logs) {
+            if (!logs.length) return [];
+
+            const timestamps=logs.map(log => new Date(log.Timestamp));
+            const start=new Date(Math.min(...timestamps));
+            const end=new Date(Math.max(...timestamps));
+            const dates=new Map();
+
+            // Pre-populate all dates with 0 counts
+            for (let d=new Date(start); d<=end; d.setDate(d.getDate()+1)) {
+                dates.set(d.toISOString().split('T')[0], 0);
+            }
+
+            return Array.from(dates, ([date, count]) => ({ date, count }));
+        }
+
+        static countLogsByType(logs, type) {
+            if (!logs.length) return [];
+
+            const dateEntries=this.processLogDates(logs);
+            const dateMap=new Map(dateEntries.map(entry => [entry.date, entry]));
+
+            if (type) {
+                logs.filter(log => log.LogType===type)
+                    .forEach(log => {
+                        const date=log.Timestamp.split('T')[0];
+                        const entry=dateMap.get(date);
+                        if (entry) entry.count++;
+                    });
+            }
+
+            return Array.from(dateMap.values());
+        }
+    }
+
+    class ChartConfigurator {
+        static getBaseConfig(isDark) {
+            return {
+                chart: {
+                    height: 328,
+                    type: 'line',
+                    zoom: { enabled: false },
+                    dropShadow: {
+                        enabled: true,
+                        top: 2,
+                        left: 1,
+                        blur: 2,
+                        opacity: 1
+                    },
+                    foreColor: isDark? '#ccc':'#333',
+                    toolbar: {
+                        show: false,
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                markers: {
+                    size: 6,
+                    strokeWidth: 0,
+                    hover: { size: 9 }
+                },
+                grid: {
+                    show: true,
+                    borderColor: isDark? '#1f2937':'#ccc',
+                    padding: { bottom: 0 },
+                    xaxis: { lines: { show: true } }
+                },
+                xaxis: {
+                    tooltip: { enabled: false },
+                    axisBorder: { color: isDark? '#555':'#ddd' },
+                    axisTicks: { color: isDark? '#555':'#ddd' }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    offsetY: -20,
+                    labels: { colors: isDark? '#ffffff':'#000000' }
+                },
+                tooltip: {
+                    theme: isDark? 'dark':'light',
+                },
+            };
+        }
+
+        static getChartConfig(isDark, usage, error, issue, time) {
+            const colors=isDark? CHART_COLORS.dark:CHART_COLORS.light;
+
+            return {
+                ...this.getBaseConfig(isDark),
+                series: [
+                    { name: TRANSLATIONS.usage, data: usage.map(i => i.count), color: colors[0] },
+                    { name: TRANSLATIONS.error, data: error.map(i => i.count), color: colors[1] },
+                    { name: TRANSLATIONS.issue, data: issue.map(i => i.count), color: colors[2] }
+                ],
+                title: {
+                    text: TRANSLATIONS.LogsStatistics,
+                    align: 'left',
+                    offsetY: 25,
+                    offsetX: 20,
+                    style: { color: isDark? '#ffffff':'#000000' }
+                },
+                labels: time.map(i => i.date)
+            };
+        }
+    }
+
+    class Dashboard {
+        constructor() {
+            this.state=new DashboardState();
+        }
+
+        async initialize() {
+            try {
+                this.state.allDataLogs= <%- JSON.stringify(dataLogs)%>;
+                const allDataList= <%- JSON.stringify(data)%>;
+                this.state.devicesByGateway=DataProcessor.processDeviceData(allDataList.devices);
+
+                this.updateDashboard();
+                this.createCharts();
+            } catch (error) {
+                console.error('Failed to initialize dashboard:', error);
+            }
+        }
+
+        updateDashboard() {
+            const data=DataProcessor.aggregateContractData(
+                this.state.devicesByGateway,
+                devices => this.state.getDeviceStatus(devices)
+            );
+
+            // Use a single reflow by building HTML string
+            const updates={
+                'total-contracts': this.state.devicesByGateway.length,
+                'total-devices': this.state.devicesByGateway.reduce((sum, contract) =>
+                    sum+contract.devices.length, 0),
+                'total-online': data.totalOnline,
+                'total-offline': data.totalOffline
+            };
+
+            Object.entries(updates).forEach(([id, value]) => {
+                document.getElementById(id).textContent=value;
+            });
+        }
+
+        createCharts() {
+            const isDark=localStorage.getItem("color-theme")==="dark"||
+                (!("color-theme" in localStorage)&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+            const logTypes=["usage", "error", "issue"];
+            const logData=logTypes.reduce((acc, type) => {
+                acc[type]=DataProcessor.countLogsByType(this.state.allDataLogs, type);
+                return acc;
+            }, {});
+
+            const time=DataProcessor.countLogsByType(this.state.allDataLogs);
+
+            const chart=new ApexCharts(
+                document.querySelector("#chart"),
+                ChartConfigurator.getChartConfig(isDark, logData.usage, logData.error, logData.issue, time)
+            );
+
+            chart.render();
+            this.state.charts.push({ chart, getChartConfig: ChartConfigurator.getChartConfig });
+        }
+
+        recreateCharts() {
+            this.state.charts.forEach(({ chart }) => chart.destroy());
+            this.state.charts=[];
+
+            this.createCharts();
+        }
+    }
+
+    dashboard=new Dashboard();
+    dashboard.initialize().catch(console.error);
 
 </script>

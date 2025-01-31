@@ -1,0 +1,655 @@
+<div
+    class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4 animate-fade-in-down transition-opacity duration-500 ease-out">
+    <!-- logtype, memberid, deviceid, daterange -->
+
+    <div class="w-full flex items-start justify-end col-span-2 md:col-span-4 xl:col-span-6">
+        <button id="btnClearAll" onclick="searchAll()"
+            class="inline-flex items-center text-sm font-medium px-1 rounded hover:bg-gray-300 dark:text-white dark:hover:bg-gray-600">
+            <i class='bx bxs-eraser'></i>
+            <%= i18n.__('clearAll') %>
+        </button>
+    </div>
+
+    <div class="w-full flex flex-col gap-2 justify-start col-span-2 md:col-span-4 xl:col-span-6">
+        <label class="block text-sm font-medium dark:text-white">
+            <%= i18n.__('LogType') %>
+        </label>
+        <div class="flex items-center w-full gap-2" id="selectLogType">
+
+        </div>
+    </div>
+
+    <div class="w-full flex flex-col gap-2 justify-start md:col-span-2 xl:col-span-3">
+        <label class="block text-sm font-medium dark:text-white">
+            <%= i18n.__('LogDeviceName') %>
+        </label>
+        <select id="selectDeviceName"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+        </select>
+    </div>
+
+    <div class="w-full flex flex-col gap-2 justify-start md:col-span-2 xl:col-span-3">
+        <label class="block text-sm font-medium dark:text-white">
+            <%= i18n.__('LogMemberName') %>
+        </label>
+        <select id="selectMemberName"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+        </select>
+    </div>
+
+    <div class="w-full flex flex-col gap-2 justify-start col-span-2 xl:col-span-3">
+        <div class="flex items-center justify-between w-full space-x-2">
+            <label class="block text-sm font-medium dark:text-white">
+                <%= i18n.__('LogDataRange') %>
+            </label>
+            <button id="btnClearDataRange"
+                class="block text-sm font-medium px-1 rounded hover:bg-gray-300 dark:text-white dark:hover:bg-gray-600">
+                <%= i18n.__('clear') %>
+            </button>
+        </div>
+        <div id="date-range-picker" date-rangepicker datepicker-autohide class="flex items-center">
+            <div class=" relative w-full">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                    </svg>
+                </div>
+                <input id="datepicker-range-start" name="start" type="text"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full ps-10 p-2.5  dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#77DDFF] dark:focus:border-[#77DDFF]"
+                    placeholder="<%= i18n.__('selectDateStart') %>">
+            </div>
+            <span class="mx-2 text-gray-500">
+                <%= i18n.__('to') %>
+            </span>
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                    </svg>
+                </div>
+                <input id="datepicker-range-end" name="end" type="text"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full ps-10 p-2.5  dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#77DDFF] dark:focus:border-[#77DDFF]"
+                    placeholder="<%= i18n.__('selectDateEnd') %>">
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="w-full flex flex-col gap-2 justify-start col-span-2 md:col-span-2 xl:col-span-3">
+        <label class="block text-sm font-medium dark:text-white">
+            <%= i18n.__('search') %>
+        </label>
+        <div class="flex items-center relative">
+            <input type="text" id="searchData"
+                class="z-20 bg-gray-50 border border-gray-300 border-r-0   text-gray-900 text-sm rounded-lg rounded-r-none focus:ring-0 focus:border-purple-500 block w-full ps-4 p-2.5  dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]"
+                placeholder="<%= i18n.__('search') %>" required />
+            <button id="searchDataBtn"
+                class="z-20 flex items-center h-full px-4 py-1 rounded-r-lg text-xl bg-purple-500 dark:bg-[#77DDFF] text-white dark:text-black"><i
+                    class='bx bx-search'></i></button>
+            <!-- search recommend -->
+            <div id="inputSearchShow"
+                class="hidden overflow-y-auto z-10 absolute w-full max-h-64 top-10 left-0 rounded-bl-lg rounded-br-lg border shadow-xl dark:border-gray-600  bg-white dark:bg-[#1C1E1F] ">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- sort control -->
+<div class="flex items-start justify-end w-full animate-fade-in-down transition-opacity duration-500 ease-out">
+    <select id="sortDataBtn"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full sm:w-52 p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+    </select>
+</div>
+
+<!-- table -->
+<div
+    class="relative overflow-x-auto flex-1 overflow-auto animate-fade-in-down transition-opacity duration-500 ease-out">
+    <table class="w-full text-sm text-left text-black dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase  bg-white dark:bg-[#1C1E1F] dark:text-gray-400 border-b border-gray-300 dark:border-gray-600">
+            <tr>
+                <th scope="col" class="px-6 py-3  rounded-tl-lg">
+                    #
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    <%= i18n.__('Logmessage') %>
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    <%= i18n.__('LogDeviceName') %>
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    <%= i18n.__('LogMemberName') %>
+                </th>
+                <th scope="col" class="px-6 py-3 rounded-tr-lg">
+                    <%= i18n.__('LogTime') %>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="logsTable">
+
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const thaiLocalization= <%-JSON.stringify(thaiLocalization)%>;
+    window.addEventListener("load", () => {
+        setTimeout(() => {
+            let locales={
+                lang: {
+                    days: thaiLocalization.days,
+                    daysShort: thaiLocalization.daysShort,
+                    daysMin: thaiLocalization.daysMin,
+                    months: thaiLocalization.months,
+                    monthsShort: thaiLocalization.monthsShort,
+                    today: thaiLocalization.today,
+                    weekStart: 0,
+                    clear: thaiLocalization.clear,
+                    format: "dd/mm/yyyy",
+                }
+            };
+            let flowbitePickers=Object.values(FlowbiteInstances.getInstances("Datepicker")).map((instance) => {
+                return instance.getDatepickerInstance();
+            });
+
+            for (const flowbitePicker of flowbitePickers) {
+                for (const picker of flowbitePicker.datepickers||[flowbitePicker]) {
+                    Object.assign(picker.constructor.locales, locales);
+                    picker.setOptions({ language: "lang" });
+                }
+            }
+        }, 100);
+    });
+</script>
+
+
+<script>
+    var translations={
+        usage: "<%= i18n.__('usage') %>",
+        error: "<%= i18n.__('error') %>",
+        issue: "<%= i18n.__('issue') %>",
+        all: "<%= i18n.__('all') %>",
+        sortby: "<%= i18n.__('sortby') %>",
+        noSearchReuslt: "<%= i18n.__('noSearchReuslt') %>",
+        sortDateDESC: "<%= i18n.__('sortDateDESC') %>",
+        sortDateASC: "<%= i18n.__('sortDateASC') %>",
+        in: "<%= i18n.__('in') %>",
+        LogDeviceName: "<%= i18n.__('LogDeviceName') %>",
+        LogMemberName: "<%= i18n.__('LogMemberName') %>",
+        LogType: "<%= i18n.__('LogType') %>",
+    }
+
+    let sort=[
+        {
+            type: 1,
+            name: translations.sortDateDESC
+        },
+        {
+            type: 2,
+            name: translations.sortDateASC
+        },
+    ]
+
+    let allDataLogs=[]
+    let dataLogsFilter=[]
+
+    let getLogTypeValue=[];
+    let getDeviceNameValue=null;
+    let getMemberNameValue=null;
+    let getRangeStartValue=null;
+    let getRangeEndValue=null;
+    let getSortValue=null
+    let searchItems=[];
+    let currentIndex=-1;
+
+    const getSearchInputValue=document.getElementById('searchData')
+    const inputSearchShow=document.getElementById('inputSearchShow');
+    const selectDeviceName=document.getElementById('selectDeviceName')
+    const selectMemberName=document.getElementById('selectMemberName')
+    const datePickerRangeStart=document.getElementById('datepicker-range-start');
+    const datePickerRangeEnd=document.getElementById('datepicker-range-end');
+    const btnClearDataRange=document.getElementById('btnClearDataRange');
+    const sortDataBtn=document.getElementById('sortDataBtn');
+
+
+
+    async function getData() {
+        allDataLogs= <%- JSON.stringify(data)%>;
+        dataLogsFilter=allDataLogs;
+    }
+
+    getData()
+        .then(() => {
+            controlDataLogs();
+            manageMenuDataBeforeDisplay();
+        })
+        .catch((err) => console.log(err));
+
+
+
+
+    function manageMenuDataBeforeDisplay() {
+        inputSearchShow.innerHTML='';
+        const getSearchValue=getSearchInputValue.value;
+        getDeviceNameValue=selectDeviceName.value;
+        getMemberNameValue=selectMemberName.value;
+
+        let startDate=null;
+        let endDate=null;
+
+        // Convert range dates to local timezone and set time to 00:00:00
+        if (getRangeStartValue!==null&&getRangeEndValue!==null) {
+            startDate=new Date(getRangeStartValue);
+            startDate.setHours(0, 0, 0, 0);
+
+            endDate=new Date(getRangeEndValue);
+            endDate.setHours(0, 0, 0, 0);
+        }
+
+        const selectedLogTypes=Object.keys(getLogTypeValue)
+            .filter(type => getLogTypeValue[type]?.checked);
+
+        dataLogsFilter=allDataLogs.filter(data => {
+            // Log type filtering
+            if (selectedLogTypes.length>0&&!selectedLogTypes.includes(data.LogType)) {
+                return false;
+            }
+
+            // Device name filtering
+            if (getDeviceNameValue!=='all'&&data.DeviceName!==getDeviceNameValue) {
+                return false;
+            }
+
+            // Member name filtering
+            if (getMemberNameValue!=='all'&&data.MemberName!==getMemberNameValue) {
+                return false;
+            }
+
+            // Date filtering
+            const dataTimestamp=new Date(data.Timestamp);
+            dataTimestamp.setHours(0, 0, 0, 0); // Set time to 00:00:00
+
+            if (startDate&&dataTimestamp<startDate) {
+                return false; // Data is earlier than the start date
+            }
+
+            if (endDate&&dataTimestamp>endDate) {
+                return false; // Data is later than the end date
+            }
+
+            return true;
+        });
+
+        sortDataBeforeDisplay();
+        displayDataToTable();
+    }
+
+    function sortDataBeforeDisplay() {
+        getSortValue=sortDataBtn.value;
+        if (getSortValue!=null) {
+            if (getSortValue==1) {
+                dataLogsFilter.sort((a, b) => {
+                    return new Date(b.Timestamp)-new Date(a.Timestamp); // Fix here: return comparison result
+                });
+            } else if (getSortValue==2) {
+                dataLogsFilter.sort((a, b) => {
+                    return new Date(a.Timestamp)-new Date(b.Timestamp); // Fix here: return comparison result
+                });
+            }
+        }
+    }
+
+    getSearchInputValue.addEventListener("input", (e) => {
+        controlDataLogs(e.target.value.toLowerCase())
+    })
+
+
+    selectDeviceName.addEventListener('change', () => {
+        manageMenuDataBeforeDisplay()
+    });
+
+    selectMemberName.addEventListener('change', () => {
+        manageMenuDataBeforeDisplay()
+    });
+
+
+    datePickerRangeStart.addEventListener('changeDate', (event) => {
+        getRangeStartValue=event.detail.date
+        manageMenuDataBeforeDisplay()
+    });
+
+    datePickerRangeEnd.addEventListener('changeDate', (event) => {
+        getRangeEndValue=event.detail.date
+        manageMenuDataBeforeDisplay()
+    });
+
+    btnClearDataRange.addEventListener('click', () => {
+        const datePickers=document.querySelectorAll('#datepicker-range-start, #datepicker-range-end');
+        datePickers.forEach((picker) => {
+            picker.value=""
+        })
+        getRangeStartValue=null;
+        getRangeEndValue=null;
+        manageMenuDataBeforeDisplay()
+    })
+
+    sortDataBtn.addEventListener("change", function () {
+        manageMenuDataBeforeDisplay();
+    });
+
+
+    function searchAll() {
+        // back to default
+        let checkboxes=document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked=true;
+            let id=checkbox.id.replace('checkbox-item-', '').split('-');
+            getLogTypeValue[id]={
+                checked: true,
+            };
+        });
+        selectDeviceName.value="all"
+        selectMemberName.value="all"
+        const datePickers=document.querySelectorAll('#datepicker-range-start, #datepicker-range-end');
+        datePickers.forEach((picker) => {
+            picker.value=""
+        })
+        getRangeStartValue=null;
+        getRangeEndValue=null;
+        inputSearchShow.classList.add("hidden")
+        inputSearchShow.innerHTML=""
+        getSearchInputValue.value=""
+        dataLogsFilter=allDataLogs;
+        manageMenuDataBeforeDisplay();
+    }
+
+    // click enter on keyboard to search 
+    getSearchInputValue.addEventListener('keydown', (e) => {
+        searchItems=document.querySelectorAll('.search-item');
+        if (e.key==='ArrowDown') {
+            if (e.target.value!=null&&e.target.value!="") {
+                e.preventDefault();
+                navigateSearchResults(1);
+            }
+        } else if (e.key==='ArrowUp') {
+            if (e.target.value!=null&&e.target.value!="") {
+                e.preventDefault();
+                navigateSearchResults(-1);
+            }
+        } else if (e.key==='Enter') {
+            e.preventDefault();
+            if (currentIndex>=0&&searchItems.length>0) {
+                searchItems[currentIndex].click();
+            } else if (e.target.value!=null&&e.target.value!="") {
+                filterDataWhenSearch(e.target.value.toLowerCase());
+            } else {
+                searchAll();
+            }
+        } else if (e.key==='Backspace') {
+            currentIndex=-1;
+        }
+    })
+
+    document.addEventListener('click', (e) => {
+        if (!getSearchInputValue.contains(e.target)&&!inputSearchShow.contains(e.target)) {
+            inputSearchShow.classList.add("hidden");
+        }
+    })
+
+    function filterDataWhenSearch(dataValue) {
+        let searchDataLog=createKeyFilter(dataValue);
+        dataLogsFilter=allDataLogs.filter((lamp) => searchDataLog.some((filter) => lamp[filter.matchType]===filter.fullKey))
+        sortDataBeforeDisplay();
+        displayDataToTable()
+    }
+
+    function navigateSearchResults(direction) {
+        if (currentIndex>=0) {
+            searchItems[currentIndex].classList.remove('bg-gray-100', 'dark:bg-gray-800');
+        }
+        currentIndex+=direction;
+
+        if (currentIndex>=searchItems.length) {
+            currentIndex=0;
+        } else if (currentIndex<0) {
+            currentIndex=searchItems.length-1;
+        }
+
+        if (currentIndex>=0&&searchItems.length>0) {
+            const selectedItem=searchItems[currentIndex];
+            selectedItem.classList.add('bg-gray-100', 'dark:bg-gray-800');
+            selectedItem.scrollIntoView({ block: 'nearest' }); // Ensure visibility
+        }
+    }
+
+
+    function controlDataLogs(getSearchInputData=null) {
+        const logType=[...new Set(allDataLogs.map(data => data.LogType))]
+            .map(type => {
+                if (type==='usage') {
+                    return { name: translations.usage, type: 'usage' };
+                } else if (type==='issue') {
+                    return { name: translations.issue, type: 'issue' };
+                } else if (type==='error') {
+                    return { name: translations.error, type: 'error' };
+                }
+            });
+
+        const deviceName=[...new Set(allDataLogs.map(data => data.DeviceName))];
+        const memberName=[...new Set(allDataLogs.map(data => data.MemberName))];
+
+        let selectLogType=document.getElementById('selectLogType')
+        selectLogType.innerHTML=''
+        let createLogTypeOption=logType.map((data) => {
+            return `
+                <div class="flex items-center me-2">
+                    <input id="checkbox-item-${data.type}" type="checkbox" value="${data.type}" checked class="cursor-pointer w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:text-cyan-500 dark:focus:ring-[#77DDFF] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    <label for="checkbox-item-${data.type}" class="cursor-pointer ms-2 text-sm font-medium">${data.name}</label>
+                </div>
+            `
+        }).join('');
+
+        selectDeviceName.innerHTML=''
+        let createDeviceName=deviceName.map((data) => {
+            return `<option value="${data}">${data}</option>`
+        })
+
+        selectMemberName.innerHTML=''
+        let createMemberName=memberName.map((data) => {
+            return `<option value="${data}">${data}</option>`
+        })
+
+
+        sortDataBtn.innerHTML=''
+        let createLogSort=sort.map((data) => {
+            return `<option value="${data.type}">${data.name}</option>`
+        })
+
+        if (getSearchInputData==null||getSearchInputData=="") {
+            // selectLogType.innerHTML=`<option value="all">${translations.all}</option>`
+            selectLogType.innerHTML+=createLogTypeOption
+            selectDeviceName.innerHTML=`<option value="all">${translations.all}</option>`
+            selectDeviceName.innerHTML+=createDeviceName
+            selectMemberName.innerHTML=`<option value="all">${translations.all}</option>`
+            selectMemberName.innerHTML+=createMemberName
+            sortDataBtn.innerHTML=`<option value="all">${translations.sortby}</option>`
+            sortDataBtn.innerHTML+=createLogSort
+            sortDataBtn.value=getSortValue==""||getSortValue==null? "all":getSortValue
+        } else {
+            // when search
+            selectLogType.innerHTML+=createLogTypeOption
+            selectDeviceName.innerHTML=`<option value="all">${translations.all}</option>`
+            selectDeviceName.innerHTML+=createDeviceName
+            selectDeviceName.value=getDeviceNameValue
+            selectMemberName.innerHTML=`<option value="all">${translations.all}</option>`
+            selectMemberName.innerHTML+=createMemberName
+            selectMemberName.value=getMemberNameValue
+            sortDataBtn.innerHTML=`<option value="all">${translations.sortby}</option>`
+            sortDataBtn.innerHTML+=createLogSort
+            sortDataBtn.value=getSortValue
+            let searchDataLog=createKeyFilter(getSearchInputData);
+            inputSearchShow.innerHTML=""
+            if (searchDataLog.length>0) {
+                inputSearchShow.classList.remove('hidden')
+                let createRecommendSearchTx=searchDataLog.map((data) => {
+                    let matchType;
+                    if (data.matchType=="DeviceName") {
+                        matchType=translations.LogDeviceName
+                    } else if (data.matchType=="MemberName") {
+                        matchType=translations.LogMemberName
+                    }
+                    let highlightedText=data.highlight.replace(/\[(.*?)\]/g, '<span class="bg-yellow-200 font-normal dark:bg-gray-600">$1</span>');
+                    return `<p class="search-item text-sm font-light text-black py-2 px-4 border-b hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-800 dark:text-white dark:border-gray-600"
+                    data-key="${data.fullKey}" data-type="${data.matchType}">${highlightedText}<br>
+                    <span class="font-medium text-xs text-gray-500 dark:text-gray-400">${translations.in} ${matchType}</span></p>`;
+                }).join('');
+                inputSearchShow.innerHTML=`<p class="search-item-all search-item text-sm font-light text-black py-2 px-4 border-b hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-800 dark:text-white dark:border-gray-600">Search All`
+                inputSearchShow.innerHTML+=createRecommendSearchTx
+
+                document.querySelector('.search-item-all').addEventListener('click', () => {
+                    searchAll();
+                })
+
+                document.querySelectorAll('.search-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const key=item.getAttribute('data-key');
+                        const type=item.getAttribute('data-type')
+                        getSearchInputValue.value=key
+                        inputSearchShow.classList.add("hidden")
+
+                        if (type=="DeviceName") {
+                            dataLogsFilter=allDataLogs
+                                .filter(data => data.DeviceName==key)
+                        } else if (type=="MemberName") {
+                            dataLogsFilter=allDataLogs
+                                .filter(data => data.MemberName==key)
+                        }
+                        sortDataBeforeDisplay();
+                        displayDataToTable()
+                    });
+                });
+            } else {
+                inputSearchShow.classList.add("hidden")
+            }
+        }
+
+
+        let checkboxes=document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            let id=checkbox.id.replace('checkbox-item-', '').split('-');
+            getLogTypeValue[id]={
+                checked: checkbox.checked,
+            };
+            checkbox.addEventListener('change', function () {
+                getLogTypeValue[id]={
+                    checked: checkbox.checked,
+                };
+                manageMenuDataBeforeDisplay(); // Call your custom function
+            })
+        })
+    }
+
+    let filterTypes=["DeviceName", "MemberName"]
+
+    function createKeyFilter(getSearchInputData) {
+
+        return allDataLogs.filter(data => {
+            // Device name filtering
+            if (getDeviceNameValue!=='all'&&data.DeviceName!==getDeviceNameValue) {
+                return false;
+            }
+            // Member name filtering
+            if (getMemberNameValue!=='all'&&data.MemberName!==getMemberNameValue) {
+                return false;
+            }
+            return true;
+        }).flatMap((data) => {
+            // Find all keys in filterTypes that contain the search term
+            return filterTypes
+                .filter((key) =>
+                    data[key].toLowerCase().includes(getSearchInputData.toLowerCase())
+                )
+                .map((matchType) => {
+                    // Highlight the matching part of the text in brackets
+                    const keyWithHighlight=data[matchType].replace(
+                        new RegExp(getSearchInputData, 'i'),
+                        (match) => `[${match}]`
+                    );
+                    return { fullKey: data[matchType], matchType, highlight: keyWithHighlight };
+                });
+        });
+    }
+
+    function displayDataToTable() {
+        let logsTable=document.getElementById('logsTable');
+        logsTable.innerHTML=''
+        if (dataLogsFilter.length>0) {
+            let row=dataLogsFilter.map((dev, index) => {
+                let msg;
+                if (dev.LogType=='usage') {
+                    msg=`
+                    <span class="min-w-24 bg-green-500 text-white text-xs font-medium px-2.5 py-0.5 rounded flex items-center justify-center">${translations.usage}</span>
+                    ${dev.LogValue}`
+                } else if (dev.LogType=='error') {
+                    msg=`
+                    <span class="min-w-24 bg-red-500 text-white text-xs font-medium px-2.5 py-0.5 rounded flex items-center justify-center">${translations.error}</span>
+                    ${dev.LogValue}`
+                } else if (dev.LogType=='issue') {
+                    msg=`
+                    <span class="min-w-24 bg-yellow-400 text-white text-xs font-medium px-2.5 py-0.5 rounded flex items-center justify-center">${translations.issue}</span>
+                    ${dev.LogValue}`
+                }
+                return `
+                <tr class="bg-white dark:bg-[#1C1E1F] border-b dark:border-gray-700">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    ${index+1}
+                    </th>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col items-start justify-start gap-2 lg:flex-row lg:items-center">${msg}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        ${dev.DeviceName}  #${dev.DeviceID}
+                    </td>
+                    <td class="px-6 py-4">
+                        ${dev.MemberName}  #${dev.MemberID}
+                    </td>
+                    <td class="px-6 py-4">
+                         ${formatTimestamp(dev.Timestamp)} 
+                    </td>
+                </tr>
+                `
+            }).join('');
+            logsTable.innerHTML=row;
+        } else {
+            // no alldatalogs
+            const row=`
+            <tr class="bg-white dark:bg-[#1C1E1F] border-b dark:border-gray-700">
+                <td colspan="5" class="px-6 py-4 text-center">${translations.noSearchReuslt}</td>
+            </tr>
+            `
+            logsTable.innerHTML=row;
+        }
+
+    }
+
+
+
+    const formatTimestamp=(timestamp) => {
+        const date=new Date(timestamp);
+        return date.toLocaleString('en-GB', {
+            timeZone: 'UTC',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+        }).replace(',', '');
+    };
+</script>

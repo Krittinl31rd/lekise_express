@@ -2,11 +2,31 @@ const express=require("express");
 const router=express.Router();
 const { authMiddleware, authAdmin }=require('../../middleware/auth')
 const sql=require('../../config/sql');
+const i18n=require('i18n');
 
 
 router.get("/", authMiddleware, authAdmin, async (req, res) => {
     const { site }=req.store;
     const data=await createSiteGatewayDevices(site)
+    const dataLogs=await sql.read(
+        'LampLogs',
+        '1=1',
+        {},
+        [
+            {
+                type: 'INNER',
+                table: 'Devices',
+                on: 'LampLogs.MemberID = Devices.MemberID AND LampLogs.DeviceID = Devices.DeviceID'
+            },
+            {
+                type: 'INNER',
+                table: 'Member',
+                on: 'LampLogs.MemberID = Member.MemberID'
+            }
+        ],
+        'LampLogs.MemberID, LampLogs.DeviceID, LampLogs.LogType, LampLogs.LogValue, LampLogs.Timestamp, Devices.DeviceName, Member.MemberName',
+        'LampLogs.Timestamp ASC'
+    );
 
     res.render('dashboard', {
         tab: 'dashboard',
@@ -15,6 +35,7 @@ router.get("/", authMiddleware, authAdmin, async (req, res) => {
         // token: req.cookies.token,
         currentRoute: '/',
         data: data,
+        dataLogs: dataLogs,
         messages: req.flash()
     })
 })
@@ -32,6 +53,39 @@ router.get("/lamp", authMiddleware, authAdmin, async (req, res) => {
         // token: req.cookies.token,
         currentRoute: '/lamp',
         data: data,
+        messages: req.flash()
+    })
+})
+
+router.get("/logs", authMiddleware, authAdmin, async (req, res) => {
+    const thaiLocalization=i18n.__('thaiLocalization');
+    const dataLogs=await sql.read(
+        'LampLogs',
+        '1=1',
+        {},
+        [
+            {
+                type: 'INNER',
+                table: 'Devices',
+                on: 'LampLogs.MemberID = Devices.MemberID AND LampLogs.DeviceID = Devices.DeviceID'
+            },
+            {
+                type: 'INNER',
+                table: 'Member',
+                on: 'LampLogs.MemberID = Member.MemberID'
+            }
+        ],
+        'LampLogs.MemberID, LampLogs.DeviceID, LampLogs.LogType, LampLogs.LogValue, LampLogs.Timestamp, Devices.DeviceName, Member.MemberName'
+    );
+
+    res.render('logs', {
+        tab: 'logs',
+        title: 'LeKise The Lamp',
+        store: req.store,
+        // token: req.cookies.token,
+        currentRoute: '/logs',
+        data: dataLogs,
+        thaiLocalization,
         messages: req.flash()
     })
 })
@@ -76,7 +130,7 @@ const createSiteGatewayDevices=async (site) => {
         site: {
         },
         contract: [],
-        group:[],
+        group: [],
         devices: []
     }
 

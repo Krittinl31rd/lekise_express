@@ -19,15 +19,26 @@ const sql = {
     },
 
     // Read records
-    read: async (table, where = '1=1', replacements = {}, joins = []) => {
+    read: async (table, where='1=1', replacements={}, joins=[], columns='*', orderBy='') => {
         try {
-            const joinClause = joins
-                .map(({ type = 'INNER', table: joinTable, on }) => `${type} JOIN ${joinTable} ON ${on}`)
+            if (!table) {
+                throw new Error('Table name is required');
+            }
+
+            // Construct the JOIN clause
+            const joinClause=joins
+                .map(({ type='INNER', table: joinTable, on }) => `${type} JOIN ${joinTable} ON ${on}`)
                 .join(' ');
 
-            const query = `SELECT * FROM ${table} ${joinClause} WHERE ${where}`;
-            console.log(query)
-            const [results] = await sequelize.query(query, { replacements });
+            // Add ORDER BY clause if provided
+            const orderByClause=orderBy? `ORDER BY ${orderBy}`:'';
+
+            // Construct the full query
+            const query=`SELECT ${columns} FROM ${table} ${joinClause} WHERE ${where} ${orderByClause}`;
+            console.log('Executing query:', query);
+
+            // Execute the query with replacements
+            const [results]=await sequelize.query(query, { replacements });
             return results;
         } catch (error) {
             console.error(`Error reading records from table ${table}:`, error);

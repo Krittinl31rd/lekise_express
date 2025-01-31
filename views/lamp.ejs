@@ -4,7 +4,7 @@
       <%= i18n.__('contractNumber') %>
     </label>
     <select id="selectContractNumber"
-      class="bg-gray-50 border border-gray-300 text-gray-900 mb-6 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
     </select>
   </div>
   <div class="w-full flex flex-col gap-2 justify-center">
@@ -12,7 +12,7 @@
       <%= i18n.__('group') %>
     </label>
     <select id="selectGroup"
-      class="bg-gray-50 border border-gray-300 text-gray-900 mb-6 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
     </select>
   </div>
   <div class="w-full flex flex-col gap-2 justify-start">
@@ -35,7 +35,7 @@
 </div>
 
 <!-- sort control -->
-<div class="flex items-center justify-end w-full mt-4 md:mt-[-12px] animate-fade-in-down transition-opacity duration-500 ease-out">
+<div class="flex items-center justify-end w-full md:mt-[-12px] animate-fade-in-down transition-opacity duration-500 ease-out">
   <div class="flex flex-col gap-2 w-full items-end">
     <select id="sortDataBtn"
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-purple-500 block w-full sm:w-52 p-2.5 dark:bg-[#1C1E1F] dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-[#77DDFF]">
@@ -44,7 +44,7 @@
 </div>
 
 <!-- pagination control -->
-<div id="paginationControlsTop" class="grid grid-cols-1 my-4 sm:grid-cols-2 animate-fade-in-down transition-opacity duration-500 ease-out">
+<div id="paginationControlsTop" class="grid grid-cols-1 sm:grid-cols-2 animate-fade-in-down transition-opacity duration-500 ease-out">
   <div>paginationControlsTop</div>
 </div>
 
@@ -56,7 +56,7 @@
 <div class="flex-1 overflow-auto p-2 rounded-b-lg bg-white dark:bg-[#1C1E1F] animate-fade-in-down transition-opacity duration-500 ease-out" id="containerTable">
 </div>
 <!-- pagination control -->
-<div id="paginationControlsBottom" class="grid grid-cols-1 my-4 sm:grid-cols-2 animate-fade-in-down transition-opacity duration-500 ease-out">
+<div id="paginationControlsBottom" class="grid grid-cols-1 sm:grid-cols-2 animate-fade-in-down transition-opacity duration-500 ease-out">
   paginationControlsBottom
 </div>
 
@@ -774,7 +774,7 @@
                                             <div class="w-full flex items-center">
                                                 <input id="rangeBrightness"value="50" min="0" max="100" type="range" 
                                                 class="inputRange"
-                                                style="background: linear-gradient(90deg, #3b82f6 ${(50-1)/(100-1)*100}%, #374151 ${(50-1)/(100-1)*100}%);" />
+                                                style="background: linear-gradient(90deg, #3b82f6 ${(50)/(100)*100}%, #374151 ${(50)/(100)*100}%);" />
                                             </div>
                                             <div class="grid grid-cols-3 text-black dark:text-white">
                                                 <label class="text-left">0</label>
@@ -1037,7 +1037,7 @@
                                                 value="${device.controls[1].LastValue}" min="0" max="100" 
                                                 type="range" 
                                                 class="inputRange"
-                                                style="background: linear-gradient(90deg, #3b82f6 ${(device.controls[1].LastValue-1)/(100-1)*100}%, #374151 ${(device.controls[1].LastValue-1)/(100-1)*100}%);" />
+                                                style="background: linear-gradient(90deg, #3b82f6 ${(device.controls[1].LastValue)/(100)*100}%, #374151 ${(device.controls[1].LastValue)/(100)*100}%);" />
                                             </div>
                                             <div class="grid grid-cols-3 text-black dark:text-white">
                                                 <label class="text-left">0</label>
